@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aethernote</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <header>
+    <div class="brand">Aethernote</div>
+    <div class="search">
+      <input id="globalSearch" type="search" placeholder="Search all notes (title & content)…" />
+    </div>
+    <div class="header-menu">
+      <button id="menuBtn" class="btn">...</button>
+      <div id="menuDropdown" class="dropdown-content">
+        <button class="btn" id="saveBtn" title="Export to File">Save</button>
+        <button class="btn" id="loadBtn" title="Import from File">Load</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="shelf-tabs"><div class="stack" id="tabsStack"></div></div>
+  <main id="main"></main>
+
+  <div class="overlay" id="overlay"></div>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
