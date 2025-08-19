@@ -138,7 +138,7 @@
     actions.append(leftActions, rightActions);
     const renameBtn = createEl('button', {className: 'btn ghost', textContent: '[ ]'});
     const deleteBtn = createEl('button', {className: 'btn danger', textContent: 'X'});
-    const closeBtn  = createEl('button', {className: 'btn ghost', textContent: '˅'});
+    const closeBtn  = createEl('button', {className: 'btn ghost', textContent: '▼'});
     const saveBtn   = createEl('button', {className: 'btn primary', textContent: '✓'});
 
     leftActions.append(renameBtn, deleteBtn);
