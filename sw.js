@@ -1,37 +1,59 @@
-const CACHE_NAME = 'aethernote-v2';
+const CACHE_NAME = 'aethernote-cache-v2'; // Incremented version
 const URLS_TO_CACHE = [
   './',
   './index.html',
-  './style.css',
-  './script.js'
+  // Add paths to your icons here if they are essential for the offline experience
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
+// Install: Caches core assets
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(URLS_TO_CACHE);
+      })
   );
+  self.skipWaiting();
 });
 
+// Activate: Cleans up old caches
 self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const names = await caches.keys();
-    await Promise.all(names.map(name => {
-      if (name !== CACHE_NAME) return caches.delete(name);
-    }));
-    await self.clients.claim();
-  })());
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+  return self.clients.claim();
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
+// Fetch: Serves assets from cache, falling back to network (Cache-first strategy)
+self.addEventListener('fetch', event => {
+  // We only want to cache GET requests
+  if (event.request.method !== 'GET') {
+    return;
   }
+  
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // Cache hit - return response
+        if (response) {
+          return response;
+        }
+
+        // Not in cache - fetch from network
+        return fetch(event.request);
+      })
+    );
 });
 

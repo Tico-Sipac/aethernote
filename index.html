@@ -4,20 +4,286 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aethernote</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="description" content="Aethernote - A fluid, offline-first notes application.">
+  <meta name="theme-color" content="#0d0221"/>
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    :root{
+      /* Default Theme: Cyber Glow */
+      --bg-1: #0d0221;      /* Deep space purple */
+      --bg-2: #24174d;      /* Richer violet */
+      --accent: #00d5ff;    /* Intense cyan accent */
+      --ink: #f0f0f0;       /* Slightly off-white for text */
+      --ink-dim:#a0a0a0;
+      --panel-10: rgba(255,255,255,0.10);
+      --panel-16: rgba(255,255,255,0.16);
+      --panel-24: rgba(255,255,255,0.24);
+      --r-sm:8px;
+      --r-md:10px;
+      --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0.03 0.06 0.03 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.25'/></svg>");
+      --shadow-1: 0 6px 20px rgba(0,0,0,0.35);
+      --shadow-inset: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial;
+      color:var(--ink);
+      background: linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      overflow-x:hidden;
+      transition: background .3s ease;
+    }
+
+    /* ===== Header ===== */
+    header{
+      position:sticky; top:0; z-index:20;
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 16px;
+      background: var(--panel-16);
+      backdrop-filter: blur(10px) saturate(1.05);
+      -webkit-backdrop-filter: blur(10px) saturate(1.05);
+      border-bottom:1px solid rgba(255,255,255,0.14);
+      border-radius: 0 0 var(--r-sm) var(--r-sm);
+      box-shadow: var(--shadow-1);
+    }
+    header::after{
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius: 0 0 var(--r-sm) var(--r-sm);
+      background-image: var(--noise);
+      opacity:.25;
+    }
+    .brand{font-weight:800; letter-spacing:0.4px; font-size:20px}
+    .search{
+      flex:1; display:flex; gap:10px; justify-content:flex-end;
+    }
+    .search input{
+      width:min(620px,100%);
+      padding:10px 12px; border-radius:var(--r-sm);
+      border:1px solid rgba(255,255,255,0.14);
+      background: var(--panel-10);
+      color:var(--ink); outline:none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .search input::placeholder { color: var(--ink-dim); opacity: 1; }
+
+    /* ===== Header Menu ===== */
+    .header-menu { position: relative; display: inline-flex; align-items: center; height: 100%; }
+    #menuBtn { padding: 10px 12px; display: flex; align-items: center; justify-content: center; height: 100%; }
+    .dropdown-content {
+      display: none; position: absolute; right: 0; top: 100%; margin-top: 5px;
+      background-color: var(--bg-2); min-width: 160px; box-shadow: var(--shadow-1);
+      border-radius: var(--r-sm); z-index: 1; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .dropdown-content button { width: 100%; text-align: left; margin-bottom: 4px; padding: 8px 12px; }
+    .dropdown-content button:last-child { margin-bottom: 0; }
+    .dropdown-content.show { display: block; }
+
+    /* ===== Floating bookshelf tabs ===== */
+    .shelf-tabs{
+      position:fixed; left:12px; top:96px; bottom:96px; width:84px;
+      display:flex; flex-direction:column; gap:10px; align-items:stretch;
+      z-index:15; pointer-events:none;
+    }
+    .shelf-tabs .stack{
+      overflow:auto; display:flex; flex-direction:column; gap:10px; padding-right:6px; pointer-events:auto;
+      background: var(--panel-10); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,0.10); border-radius: var(--r-sm);
+    }
+    .tab-btn{
+      border:none; cursor:pointer; border-radius: var(--r-sm); padding:10px 8px; min-height:56px;
+      color:var(--ink); background: var(--panel-10); box-shadow: var(--shadow-inset);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+      transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
+      word-break:break-word; font-weight:700; font-size:12px; position:relative;
+    }
+    .tab-btn.active{
+      background: var(--accent) !important; color: var(--bg-1) !important;
+      box-shadow: var(--shadow-1); outline: none; border: none;
+    }
+    .tab-btn.add{ font-size:20px; font-weight:900; }
+
+    @media (max-width: 720px){
+      .shelf-tabs{ left:0; right:0; width:auto; top:auto; bottom:0; height:78px; display:block;}
+      .shelf-tabs .stack{ flex-direction:row; gap:10px; padding:10px; overflow:auto; background: var(--panel-16); border-radius: var(--r-sm) var(--r-sm) 0 0; }
+      .tab-btn{ min-height:52px; min-width:72px; }
+    }
+
+    /* ===== Main area ===== */
+    main{ padding:16px; padding-left:116px; padding-bottom:110px; }
+    @media (max-width: 720px){ main{ padding:12px; padding-bottom:106px; padding-left:12px; } }
+
+    /* ===== Bookshelf header ===== */
+    .bs-header{
+      display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+      padding:12px 14px; border-radius: var(--r-sm); margin-bottom:14px;
+      background: var(--panel-16); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,0.12); box-shadow: var(--shadow-1); position:relative;
+    }
+    .bs-header::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.25; pointer-events:none; }
+    .bs-title{ font-weight:800; letter-spacing:0.3px; flex-grow:1; cursor:pointer; }
+    .bs-controls{ display:flex; gap:10px; }
+    .btn-header{
+      border:1px solid rgba(255,255,255,0.16); padding:10px 12px; border-radius: var(--r-sm);
+      background: var(--panel-10); color:var(--ink); cursor:pointer; font-weight:700;
+    }
+
+    /* ===== Shelf bar and body ===== */
+    .shelf-wrap{ margin-bottom:18px; width: 380px; display: inline-block; vertical-align: top; margin-right: 20px; }
+    .shelf-bar{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px; border-radius: var(--r-sm); color:var(--ink); font-weight:800; letter-spacing:0.2px;
+      background: var(--panel-16); border:1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      box-shadow: var(--shadow-inset), var(--shadow-1); position:relative;
+    }
+    .shelf-bar::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.25; pointer-events:none; }
+    .shelf-name{ flex-grow:1; cursor:pointer; }
+    .shelf-controls{ display:flex; gap:8px; align-items:center; }
+    .btn-shelf{
+      cursor:pointer; border:1px solid rgba(255,255,255,0.14);
+      background: var(--panel-10); color:var(--ink); padding: 10px;
+      min-width: 40px; border-radius: var(--r-sm); font-weight:900; font-size: 14px;
+    }
+    .add-book-btn{
+      cursor:pointer; border:1px solid rgba(255,255,255,0.16);
+      padding:8px 10px; border-radius: var(--r-sm); font-weight:800; color:var(--ink); background:var(--panel-10);
+      min-width:40px; min-height:36px; display:flex; align-items:center; justify-content:center; font-size:18px;
+    }
+    .delete-btn{ background: var(--panel-16); color:var(--ink); border:1px solid rgba(255,255,255,0.18); }
+
+    .shelf-body{
+      margin-top:10px; padding:10px; border-radius: var(--r-sm); background: var(--panel-10);
+      display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; border:1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); position:relative;
+    }
+    .shelf-body::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25; border-radius: inherit; pointer-events:none; }
+
+    /* ===== Book cards ===== */
+    .book, .book-add{
+      width:100%; height: 180px; border-radius: var(--r-sm); color:#fff; font-weight:900;
+      display:flex; align-items:center; justify-content:center; text-align:center; cursor:pointer; 
+      box-shadow: var(--shadow-1), var(--shadow-inset); transition: transform .15s ease, box-shadow .15s ease;
+      position:relative; aspect-ratio: 1/1.5; overflow: hidden;
+      padding: 8px 8px 8px 20px;
+      /* Word wrapping for titles */
+      white-space: normal; word-break: break-word; line-height: 1.2;
+    }
+    .book:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 0 4px rgba(255,255,255,0.06) }
+    .book::before{
+      content:""; position:absolute; left:6px; top:8px; bottom:8px; width:6px;
+      background: rgba(0,0,0,0.18); border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    .book-add{ font-size:28px; display:flex; align-items:center; justify-content:center; padding:0; }
+
+    @media (max-width:720px){
+      .shelf-body{ grid-template-columns: repeat(3, 1fr); }
+      .book, .book-add{ height: 150px; }
+      .shelf-wrap { width: 100%; display: block; margin-right: 0; }
+    }
+
+    @media (min-width: 721px) {
+      main { display: flex; flex-wrap: wrap; align-items: flex-start; }
+      .bs-header { width: 100%; }
+    }
+
+    /* ===== Modal / prompts ===== */
+    .overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:16px; z-index:30; background: radial-gradient(1200px 800px at 50% 20%, rgba(0,0,0,0.55), rgba(0,0,0,0.7)); }
+    .overlay.show{ display:flex }
+    .modal{
+      width:min(720px, 96%); background: var(--panel-16);
+      border:1px solid rgba(255,255,255,0.18); border-radius: var(--r-md); padding:12px; color:var(--ink);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position:relative;
+    }
+    .modal::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25; border-radius: inherit; pointer-events:none; }
+    .modal h3{ margin:0 0 8px 0; font-size:16px; }
+
+    /* Transparent/Noisy inputs */
+    .modal .input-wrapper { position: relative; }
+    .modal .input-wrapper::after{
+      content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25;
+      background-color: var(--panel-10); border-radius: var(--r-sm); pointer-events:none; z-index: 1;
+    }
+    .modal textarea, .modal input[type="text"] {
+      width:100%; padding:10px; border-radius: var(--r-sm);
+      border: 1px solid rgba(255,255,255,0.1); background: transparent; color:var(--ink); outline: none;
+      position: relative; z-index: 2;
+    }
+    .modal textarea::placeholder, .modal input::placeholder { color: var(--ink-dim); opacity: 1; }
+    .modal textarea{ height:34vh; min-height:140px; max-height:42vh; resize: vertical; }
+
+    .modal .row{ display:flex; gap:10px; }
+    .modal .actions{ margin-top:10px; display:flex; gap:10px; justify-content:space-between; align-items:center; }
+    .modal .actions .left-actions, .modal .actions .right-actions{ display:flex; gap:8px; }
+    .btn{ border:1px solid rgba(255,255,255,0.18); padding:8px 10px; border-radius: var(--r-sm); cursor:pointer; font-weight:800; background: var(--panel-10); color:var(--ink); }
+    .btn.primary{ background:var(--accent); color:var(--bg-1); border-color:rgba(0,0,0,0.1) }
+    .btn.ghost{ background:var(--panel-10); color:var(--ink) }
+    .btn.danger{ background:#e14444; color:#fff; border-color: rgba(0,0,0,0.12) }
+
+    /* Inline edit inputs */
+    .shelf-name input, .bs-title input {
+      background: transparent; border: none; color: inherit; font: inherit;
+      width: 100%; outline: none; padding: 0; margin: 0;
+    }
+
+    /* Note editor buttons - consistent sizing */
+    .modal .actions .btn.icon-btn {
+      width: 40px; height: 40px; display: flex;
+      align-items: center; justify-content: center; padding: 0;
+    }
+    /* Regular modal buttons (not in note editor) */
+    .modal .right-actions .btn:not(.icon-btn) {
+      width: auto; height: auto; padding: 8px 10px;
+    }
+
+    /* Tagging UI */
+    .tags-section { margin-top: 12px; }
+    .tags-input-wrapper { display: flex; gap: 8px; margin-top: 4px; }
+    .tags-input-wrapper input { flex-grow: 1; }
+    .tags-display { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 4px; min-height: 28px; }
+    .tag-item {
+      background: var(--accent); color: var(--bg-1); font-size: 12px; font-weight: 700;
+      padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;
+    }
+    .tag-item .delete-tag { cursor: pointer; font-weight: 900; }
+
+    /* Themes Modal */
+    .theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+    .theme-card {
+      padding: 12px; border-radius: var(--r-sm); cursor: pointer;
+      border: 2px solid transparent; transition: border .2s ease;
+      position: relative;
+    }
+    .theme-card.active { border-color: var(--accent); }
+    .theme-card h4 { margin: 0 0 8px 0; font-size: 14px; }
+    .theme-swatches { display: flex; gap: 4px; }
+    .swatch { width: 20px; height: 20px; border-radius: 4px; }
+    .delete-theme-btn {
+      position: absolute; top: 4px; right: 4px; width: 24px; height: 24px;
+      background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Drag and Drop styles */
+    .dragging { opacity: 0.5; }
+    .drag-over { border: 2px dashed var(--accent); background-color: rgba(0, 213, 255, 0.1); }
+  </style>
 </head>
 <body>
   <header>
     <div class="brand">Aethernote</div>
     <div class="search">
-      <input id="globalSearch" type="search" placeholder="Search all notes (title & content)…" />
+      <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." />
     </div>
     <div class="header-menu">
-      <button id="menuBtn" class="btn">...</button>
+      <button id="menuBtn" class="btn" title="Menu">...</button>
       <div id="menuDropdown" class="dropdown-content">
         <button class="btn" id="saveBtn" title="Export to File">Save</button>
         <button class="btn" id="loadBtn" title="Import from File">Load</button>
+        <button class="btn" id="themesBtn" title="Change Theme">Themes</button>
+        <button class="btn" id="updateBtn" title="Update App">Update</button>
       </div>
     </div>
   </header>
@@ -27,17 +293,719 @@
 
   <div class="overlay" id="overlay"></div>
 
-  <script src="script.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, err => {
-          console.log('ServiceWorker registration failed: ', err);
+    (function(){
+      // Register Service Worker for PWA functionality
+      // NOTE: This will only work when the file is served by a web server, not opened directly from the filesystem (file://).
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => console.log('Service Worker registered!'))
+            .catch(err => console.log('Service Worker registration failed: ', err));
         });
+      }
+
+      /* ===== Color baskets for book covers ===== */
+      const BASKETS = [
+        ['#4a90e2','#5dade2','#2874a6','#1b4d97'], ['#d35400','#e67e22','#ca6f1e','#7e5109'],
+        ['#27ae60','#2ecc71','#16a085','#196f3d'], ['#8e44ad','#9b59b6','#c39bd3','#d98880']
+      ];
+      function pickFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+      function pickTwoDifferentIndexes(n){
+        const a = Math.floor(Math.random()*n);
+        let b = Math.floor(Math.random()*n);
+        if(b === a) b = (b+1)%n;
+        return [a,b];
+      }
+      function crossBasketGradient(){
+        const [bi, bj] = pickTwoDifferentIndexes(BASKETS.length);
+        return [pickFrom(BASKETS[bi]), pickFrom(BASKETS[bj])];
+      }
+
+      const APP_KEY = 'aethernote.v3';
+      const THEMES_KEY = 'aethernote.themes.v1';
+      let state = { bookshelves: [], active: 0, activeTheme: 'Cyber Glow' };
+      let userThemes = [];
+
+      const main = document.getElementById('main');
+      const tabsStack = document.getElementById('tabsStack');
+      const overlay = document.getElementById('overlay');
+      const globalSearch = document.getElementById('globalSearch');
+
+      /* ===== Small Helpers ===== */
+      function newId(){ return 'id-' + Math.random().toString(36).slice(2); }
+      function safe(s) { return (s || '').replace(/"/g, '&quot;'); }
+      function createEl(tag, props = {}) {
+        const el = document.createElement(tag);
+        Object.entries(props).forEach(([k, v]) => {
+          if (k in el) el[k] = v;
+          else el.setAttribute(k, v);
+        });
+        return el;
+      }
+
+      /* ===== State Normalization (for backward compatibility) ===== */
+      function normalizeState(s) {
+        (s.bookshelves || []).forEach(bs => {
+          if (!bs.id) bs.id = newId();
+          (bs.shelves || []).forEach(sh => {
+            if (!sh.id) sh.id = newId();
+            if (!sh.addGradient) sh.addGradient = crossBasketGradient();
+            (sh.books || []).forEach(bk => {
+              if (!bk.id) bk.id = newId();
+              if (!bk.gradient) bk.gradient = crossBasketGradient();
+              if (!bk.tags) bk.tags = [];
+            });
+          });
+        });
+      }
+
+      /* ===== Persistence ===== */
+      function saveToStorage(){ localStorage.setItem(APP_KEY, JSON.stringify(state)); }
+      function loadFromStorage(){
+        const raw = localStorage.getItem(APP_KEY);
+        if(raw){
+          try {
+            state = JSON.parse(raw);
+            normalizeState(state);
+          } catch (e) {
+            console.error("Failed to parse state from localStorage", e);
+            state = { bookshelves: [], active: 0, activeTheme: 'Cyber Glow' };
+          }
+        }
+      }
+      function modifyState(callback, shouldRender = true) {
+        callback(state);
+        saveToStorage();
+        if (shouldRender) render();
+      }
+
+      /* ===== Generic Modals ===== */
+      function showOverlay(content) {
+        overlay.innerHTML = '';
+        overlay.appendChild(content);
+        overlay.classList.add('show');
+      }
+      function hideOverlay() {
+        overlay.classList.remove('show');
+        overlay.innerHTML = '';
+      }
+
+      function promptText(title, placeholder='Name', initial=''){
+        return new Promise(resolve => {
+          const modal = createEl('div', { className: 'modal' });
+          modal.innerHTML = `
+            <h3>${safe(title)}</h3>
+            <div class="row input-wrapper"><input type="text" id="promptInput" placeholder="${safe(placeholder)}" value="${safe(initial)}"/></div>
+            <div class="actions"><div></div><div class="right-actions">
+              <button class="btn ghost" id="cancelBtn">Cancel</button>
+              <button class="btn primary" id="okBtn">OK</button>
+            </div></div>`;
+          showOverlay(modal);
+          const input = document.getElementById('promptInput');
+          input.focus(); input.select();
+          const close = (value) => { hideOverlay(); resolve(value); };
+          modal.querySelector('#cancelBtn').onclick = () => close(null);
+          modal.querySelector('#okBtn').onclick = () => close(input.value.trim() || null);
+          overlay.onclick = e => { if(e.target === overlay) close(null); };
+          input.onkeydown = e => { if(e.key === 'Enter') { e.preventDefault(); modal.querySelector('#okBtn').click(); }};
+        });
+      }
+
+      function confirmAction(message) {
+        return new Promise(resolve => {
+          const modal = createEl('div', { className: 'modal' });
+          modal.innerHTML = `
+            <h3>Confirm Action</h3>
+            <p>${safe(message)}</p>
+            <div class="actions"><div></div><div class="right-actions">
+              <button class="btn ghost" id="cancelBtn">Cancel</button>
+              <button class="btn danger" id="okBtn">Confirm</button>
+            </div></div>`;
+          showOverlay(modal);
+          const close = (value) => { hideOverlay(); resolve(value); };
+          modal.querySelector('#cancelBtn').onclick = () => close(false);
+          modal.querySelector('#okBtn').onclick = () => close(true);
+          overlay.onclick = e => { if(e.target === overlay) close(false); };
+        });
+      }
+
+      /* ===== Note Editor with Tags ===== */
+      function editBook(book, bsIndex, shelfIndex, bookIndex){
+        const modal = createEl('div', { className: 'modal' });
+        const h3 = createEl('h3'); h3.textContent = book.title;
+        const textarea = createEl('textarea', { id: 'noteArea', placeholder: 'Write your note (Ctrl+S to save)...' });
+        textarea.value = book.content || '';
+
+        const tagsSection = createEl('div', { className: 'tags-section' });
+        tagsSection.innerHTML = `<h4>Tags</h4>`;
+        const tagsInputWrapper = createEl('div', { className: 'tags-input-wrapper input-wrapper' });
+        const tagsInput = createEl('input', { type: 'text', placeholder: 'Add a tag and press Enter...' });
+        const tagsDisplay = createEl('div', { className: 'tags-display' });
+        tagsInputWrapper.append(tagsInput);
+        tagsSection.append(tagsInputWrapper, tagsDisplay);
+
+        const renderTags = () => {
+          tagsDisplay.innerHTML = '';
+          (book.tags || []).forEach((tag, tagIndex) => {
+            const tagItem = createEl('div', { className: 'tag-item' });
+            tagItem.textContent = tag;
+            const deleteTagBtn = createEl('span', { className: 'delete-tag', textContent: '×', title: 'Remove tag' });
+            deleteTagBtn.onclick = () => {
+              book.tags.splice(tagIndex, 1);
+              saveToStorage();
+              renderTags();
+            };
+            tagItem.append(deleteTagBtn);
+            tagsDisplay.append(tagItem);
+          });
+        };
+        renderTags();
+
+        tagsInput.onkeydown = e => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const newTag = tagsInput.value.trim().toLowerCase();
+            if (newTag && !(book.tags || []).includes(newTag)) {
+              if (!book.tags) book.tags = [];
+              book.tags.push(newTag);
+              saveToStorage();
+              renderTags();
+            }
+            tagsInput.value = '';
+          }
+        };
+
+        const actions = createEl('div', { className: 'actions' });
+        const leftActions = createEl('div', { className: 'left-actions' });
+        const rightActions = createEl('div', { className: 'right-actions' });
+        actions.append(leftActions, rightActions);
+        
+        const renameBtn = createEl('button', {className: 'btn ghost icon-btn', textContent: '✎', title: 'Rename'});
+        const deleteBtn = createEl('button', {className: 'btn danger icon-btn', textContent: '✕', title: 'Delete'});
+        const closeBtn  = createEl('button', {className: 'btn ghost icon-btn', textContent: '▼', title: 'Close'});
+        const saveBtn   = createEl('button', {className: 'btn primary icon-btn', textContent: '✓', title: 'Save (Ctrl+S)'});
+
+        leftActions.append(renameBtn, deleteBtn);
+        rightActions.append(closeBtn, saveBtn);
+
+        modal.append(h3, textarea, tagsSection, actions);
+        showOverlay(modal);
+        textarea.focus();
+        
+        const doSave = () => { 
+          book.content = textarea.value; 
+          saveToStorage();
+        };
+        
+        renameBtn.onclick = async () => {
+          const newTitle = await promptText('Rename Book', 'New book title', book.title);
+          if (newTitle) {
+            modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books[bookIndex].title = newTitle);
+            h3.textContent = newTitle;
+          }
+        };
+        deleteBtn.onclick = async () => {
+          if (await confirmAction(`Are you sure you want to delete the book "${book.title}"?`)) {
+            modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.splice(bookIndex, 1));
+            hideOverlay();
+          }
+        };
+        closeBtn.onclick = hideOverlay;
+        saveBtn.onclick = () => { doSave(); hideOverlay(); };
+        overlay.onclick = e => { if(e.target === overlay) { doSave(); hideOverlay(); } };
+        
+        modal.onkeydown = e => {
+          if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            doSave();
+            saveBtn.style.transform = 'scale(1.1)';
+            setTimeout(() => saveBtn.style.transform = 'scale(1)', 150);
+          }
+        };
+      }
+
+      /* ===== Inline Edit Helper ===== */
+      function enableInlineEdit(element, onSave) {
+        element.onclick = (e) => {
+          e.stopPropagation();
+          if (e.target.tagName === 'INPUT') return;
+          const currentText = element.textContent;
+          const input = createEl('input', { type: 'text', value: currentText });
+          element.textContent = '';
+          element.appendChild(input);
+          input.focus(); input.select();
+          const save = () => {
+            const newText = input.value.trim();
+            if (newText && newText !== currentText) onSave(newText);
+            element.textContent = newText || currentText;
+          };
+          input.onblur = save;
+          input.onkeydown = (e) => {
+            if (e.key === 'Enter') input.blur();
+            if (e.key === 'Escape') { input.value = currentText; input.blur(); }
+          };
+        };
+      }
+
+      /* ===== Render ===== */
+      function render() {
+        renderTabs();
+        main.innerHTML = '';
+        const searchVal = (globalSearch.value || '').trim().toLowerCase();
+        if (searchVal) {
+          renderSearchResults(searchVal);
+          return;
+        }
+        if (!state.bookshelves.length) {
+          renderEmptyState();
+          return;
+        }
+        const currentBS = state.bookshelves[state.active] || state.bookshelves[0];
+        if (!currentBS) { renderEmptyState(); return; }
+        const header = renderBookshelfHeader(currentBS, state.active);
+        main.appendChild(header);
+        const shelfContainer = createEl('div');
+        (currentBS.shelves || []).forEach((shelf, shelfIndex) => {
+          shelfContainer.appendChild(renderShelf(shelf, state.active, shelfIndex));
+        });
+        main.appendChild(shelfContainer);
+        initDragAndDrop();
+      }
+
+      function renderTabs() {
+        tabsStack.innerHTML = '';
+        state.bookshelves.forEach((bs, i) => {
+          const b = createEl('button', {
+            className: 'tab-btn' + (state.active === i ? ' active' : ''),
+            title: bs.name,
+            textContent: bs.name.slice(0, 10) + (bs.name.length > 10 ? '…' : '')
+          });
+          b.onclick = () => modifyState(s => s.active = i);
+          tabsStack.appendChild(b);
+        });
+        const add = createEl('button', { className: 'tab-btn add', textContent: '+', title: 'Add bookshelf' });
+        add.onclick = async () => {
+          const name = await promptText('New Bookshelf', 'Bookshelf name');
+          if (!name) return;
+          modifyState(s => {
+            s.bookshelves.push({ id: newId(), name, shelves: [] });
+            s.active = s.bookshelves.length - 1;
+          });
+        };
+        tabsStack.appendChild(add);
+      }
+
+      function renderEmptyState() {
+        main.innerHTML = '';
+        const empty = createEl('div', { className: 'bs-header' });
+        const title = createEl('div', { className: 'bs-title', textContent: 'No bookshelves yet' });
+        const btn = createEl('button', { className: 'btn-header', textContent: 'Create your first bookshelf' });
+        btn.onclick = async () => {
+          const name = await promptText('New Bookshelf', 'Bookshelf name');
+          if (!name) return;
+          modifyState(s => {
+            s.bookshelves.push({ id: newId(), name, shelves: [] });
+            s.active = 0;
+          });
+        };
+        empty.append(title, btn);
+        main.appendChild(empty);
+      }
+
+      function renderBookshelfHeader(bs, bsIndex) {
+        const header = createEl('div', { className: 'bs-header' });
+        const title = createEl('div', { className: 'bs-title', textContent: bs.name });
+        enableInlineEdit(title, (newName) => {
+          modifyState(s => s.bookshelves[bsIndex].name = newName);
+        });
+        const controls = createEl('div', { className: 'bs-controls' });
+        const addShelfBtn = createEl('button', { className: 'btn-header', textContent: '+ Shelf' });
+        addShelfBtn.onclick = async () => {
+          const name = await promptText('New Shelf', 'Shelf name');
+          if (!name) return;
+          modifyState(s => {
+            if (!s.bookshelves[bsIndex].shelves) s.bookshelves[bsIndex].shelves = [];
+            s.bookshelves[bsIndex].shelves.push({ id: newId(), name, collapsed: false, books: [], addGradient: crossBasketGradient() });
+          });
+        };
+        const deleteBSBtn = createEl('button', { className: 'btn-header', textContent: 'Delete Bookshelf' });
+        deleteBSBtn.onclick = async () => {
+          if (await confirmAction(`Delete the bookshelf "${bs.name}" and all its contents? This cannot be undone.`)) {
+            modifyState(s => {
+              s.bookshelves.splice(bsIndex, 1);
+              s.active = Math.max(0, s.active - 1);
+            });
+          }
+        };
+        controls.append(addShelfBtn, deleteBSBtn);
+        header.append(title, controls);
+        return header;
+      }
+
+      function renderShelf(shelf, bsIndex, shelfIndex) {
+        const wrap = createEl('div', { className: 'shelf-wrap', 'data-shelf-id': shelf.id });
+        const bar = createEl('div', { className: 'shelf-bar' });
+        const name = createEl('div', { className: 'shelf-name', textContent: shelf.name });
+        enableInlineEdit(name, (newName) => {
+          modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].name = newName);
+        });
+        const ctrls = createEl('div', { className: 'shelf-controls' });
+        if (!shelf.addGradient) shelf.addGradient = crossBasketGradient();
+        const [addG1, addG2] = shelf.addGradient;
+        const addB = createEl('button', { className: 'add-book-btn', textContent: '+' });
+        addB.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
+        addB.onclick = async () => {
+          const title = await promptText('New Book', 'Book title');
+          if (!title) return;
+          modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.push({
+            id: newId(), title, content: '', gradient: crossBasketGradient(), tags: []
+          }));
+        };
+        const delShelf = createEl('button', { className: 'btn-shelf delete-btn', textContent: 'X' });
+        delShelf.onclick = async () => {
+          if (await confirmAction(`Are you sure you want to delete the shelf "${shelf.name}"?`)) {
+            modifyState(s => s.bookshelves[bsIndex].shelves.splice(shelfIndex, 1));
+          }
+        };
+        const coll = createEl('button', { className: 'btn-shelf', textContent: shelf.collapsed ? '▶' : '▼' });
+        coll.onclick = () => modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].collapsed = !s.bookshelves[bsIndex].shelves[shelfIndex].collapsed);
+        ctrls.append(addB, delShelf, coll);
+        bar.append(name, ctrls);
+        wrap.appendChild(bar);
+        if (!shelf.collapsed) {
+          const body = createEl('div', { className: 'shelf-body', 'data-shelf-id': shelf.id });
+          (shelf.books || []).forEach((book, bookIndex) => {
+            body.appendChild(renderBook(book, bsIndex, shelfIndex, bookIndex));
+          });
+          const addTile = createEl('div', { className: 'book-add', textContent: '+' });
+          addTile.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
+          addTile.onclick = addB.onclick;
+          body.appendChild(addTile);
+          wrap.appendChild(body);
+        }
+        return wrap;
+      }
+
+      function renderBook(book, bsIndex, shelfIndex, bookIndex) {
+        const [a, b] = (book.gradient && book.gradient.length === 2) ? book.gradient : (book.gradient = crossBasketGradient());
+        const el = createEl('div', { 
+            className: 'book', 
+            textContent: book.title, 
+            draggable: true, 
+            'data-book-id': book.id 
+        });
+        el.style.background = `linear-gradient(135deg, ${a}, ${b})`;
+        el.onclick = () => editBook(book, bsIndex, shelfIndex, bookIndex);
+        return el;
+      }
+
+      function renderSearchResults(query) {
+          const tagMatches = [];
+          const otherMatches = [];
+          const matchedBookIds = new Set();
+
+          state.bookshelves.forEach((bs, bi) => {
+              (bs.shelves || []).forEach((sh, si) => {
+                  (sh.books || []).forEach((bk, ki) => {
+                      const hasTagMatch = (bk.tags || []).some(tag => tag.toLowerCase().includes(query));
+                      if (hasTagMatch) {
+                          tagMatches.push({ bi, si, ki, bs, sh, bk });
+                          matchedBookIds.add(bk.id);
+                      }
+                  });
+              });
+          });
+
+          state.bookshelves.forEach((bs, bi) => {
+              (bs.shelves || []).forEach((sh, si) => {
+                  (sh.books || []).forEach((bk, ki) => {
+                      if (matchedBookIds.has(bk.id)) return;
+                      const hasOtherMatch = (bk.title || '').toLowerCase().includes(query) || (bk.content || '').toLowerCase().includes(query);
+                      if (hasOtherMatch) {
+                          otherMatches.push({ bi, si, ki, bs, sh, bk });
+                      }
+                  });
+              });
+          });
+
+          const results = [...tagMatches, ...otherMatches];
+          const header = createEl('div', { className: 'bs-header' });
+          const title = createEl('div', { className: 'bs-title' });
+          title.textContent = `Search results for “${query}” — ${results.length} match(es)`;
+          header.appendChild(title);
+          main.appendChild(header);
+
+          const body = createEl('div', { className: 'shelf-body' });
+          results.forEach(({ bk, bi, si, ki, bs, sh }) => {
+              const card = renderBook(bk, bi, si, ki);
+              card.title = `${bs.name} › ${sh.name} › ${bk.title}`;
+              body.appendChild(card);
+          });
+          main.appendChild(body);
+      }
+
+      /* ===== File Operations ===== */
+      function saveToFile() {
+        const data = JSON.stringify(state, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = createEl('a', { href: url, download: 'aethernote_backup.json' });
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function loadFromFile() {
+        const input = createEl('input', { type: 'file', accept: '.json' });
+        input.onchange = e => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              const newState = JSON.parse(event.target.result);
+              if (newState && Array.isArray(newState.bookshelves)) {
+                normalizeState(newState);
+                if (await confirmAction('This will overwrite your current notes. Are you sure?')) {
+                  modifyState(s => {
+                    s.bookshelves = newState.bookshelves;
+                    s.active = newState.active || 0;
+                    s.activeTheme = newState.activeTheme || 'Cyber Glow';
+                  });
+                  applyTheme(getThemeByName(state.activeTheme));
+                }
+              } else { alert('Invalid file format.'); }
+            } catch (err) { alert('Could not read file.'); console.error(err); }
+          };
+          reader.readAsText(file);
+        };
+        input.click();
+      }
+
+      /* ===== Update App Function ===== */
+      function updateApp() {
+        if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+          navigator.serviceWorker.getRegistration().then(registration => {
+            if (registration) {
+              registration.update().then(() => {
+                alert('App is checking for updates. If a new version is found, it will be used after you close all tabs of this app.');
+              });
+            }
+          });
+        } else {
+          alert('PWA not installed or not supported.');
+        }
+      }
+
+      /* ===== Themes ===== */
+      const SYSTEM_THEMES = [
+        { name: 'Cyber Glow', isSystem: true, colors: { '--bg-1': '#0d0221', '--bg-2': '#24174d', '--accent': '#00d5ff', '--ink': '#f0f0f0', '--ink-dim': '#a0a0a0', '--panel-10': 'rgba(255,255,255,0.10)', '--panel-16': 'rgba(255,255,255,0.16)', '--panel-24': 'rgba(255,255,255,0.24)' } },
+        { name: 'Solarized Light', isSystem: true, colors: { '--bg-1': '#fdf6e3', '--bg-2': '#eee8d5', '--accent': '#268bd2', '--ink': '#586e75', '--ink-dim': '#93a1a1', '--panel-10': 'rgba(0,0,0,0.04)', '--panel-16': 'rgba(0,0,0,0.06)', '--panel-24': 'rgba(0,0,0,0.08)' } },
+        { name: 'Crimson Night', isSystem: true, colors: { '--bg-1': '#1a1a1d', '--bg-2': '#2a2a2e', '--accent': '#e50914', '--ink': '#f5f5f1', '--ink-dim': '#999', '--panel-10': 'rgba(255,255,255,0.05)', '--panel-16': 'rgba(255,255,255,0.08)', '--panel-24': 'rgba(255,255,255,0.12)' } },
+        { name: 'Forest Depths', isSystem: true, colors: { '--bg-1': '#1e3c42', '--bg-2': '#2a524f', '--accent': '#a2c523', '--ink': '#e0e0e0', '--ink-dim': '#a0a0a0', '--panel-10': 'rgba(0,0,0,0.1)', '--panel-16': 'rgba(0,0,0,0.15)', '--panel-24': 'rgba(0,0,0,0.2)' } },
+        { name: 'Royal Gold', isSystem: true, colors: { '--bg-1': '#2c2a4d', '--bg-2': '#4f4c7a', '--accent': '#ffd700', '--ink': '#f0e6d2', '--ink-dim': '#bdae93', '--panel-10': 'rgba(255,255,255,0.08)', '--panel-16': 'rgba(255,255,255,0.12)', '--panel-24': 'rgba(255,255,255,0.18)' } },
+        { name: 'Monochrome', isSystem: true, colors: { '--bg-1': '#f5f5f5', '--bg-2': '#e0e0e0', '--accent': '#333', '--ink': '#111', '--ink-dim': '#666', '--panel-10': 'rgba(0,0,0,0.05)', '--panel-16': 'rgba(0,0,0,0.08)', '--panel-24': 'rgba(0,0,0,0.1)' } }
+      ];
+
+      function loadUserThemes() {
+        const raw = localStorage.getItem(THEMES_KEY);
+        if (raw) userThemes = JSON.parse(raw);
+      }
+      function saveUserThemes() {
+        localStorage.setItem(THEMES_KEY, JSON.stringify(userThemes));
+      }
+      function getAllThemes() {
+        return [...SYSTEM_THEMES, ...userThemes];
+      }
+      function getThemeByName(name) {
+        return getAllThemes().find(t => t.name === name);
+      }
+      function applyTheme(theme, themeListContainer = null) {
+        if (!theme) return;
+        for (const [key, value] of Object.entries(theme.colors)) {
+          document.documentElement.style.setProperty(key, value);
+        }
+        modifyState(s => s.activeTheme = theme.name, false);
+
+        if(themeListContainer) {
+            themeListContainer.querySelector('.theme-card.active')?.classList.remove('active');
+            const newActiveCard = Array.from(themeListContainer.querySelectorAll('.theme-card')).find(card => card.querySelector('h4').textContent === theme.name);
+            newActiveCard?.classList.add('active');
+        }
+      }
+
+      function showThemesModal() {
+        const modal = createEl('div', { className: 'modal' });
+        modal.innerHTML = `<h3>Themes</h3>`;
+        const themeList = createEl('div', { className: 'theme-list' });
+        
+        const renderThemeList = (container) => {
+            container.innerHTML = '';
+            getAllThemes().forEach(theme => {
+                const card = createEl('div', { className: 'theme-card' + (state.activeTheme === theme.name ? ' active' : '') });
+                card.onclick = () => applyTheme(theme, container);
+                const name = createEl('h4'); name.textContent = theme.name;
+                const swatches = createEl('div', { className: 'theme-swatches' });
+                ['--bg-1', '--bg-2', '--accent', '--ink'].forEach(key => {
+                    const swatch = createEl('div', { className: 'swatch' });
+                    swatch.style.backgroundColor = theme.colors[key];
+                    swatches.appendChild(swatch);
+                });
+                card.append(name, swatches);
+                if (!theme.isSystem) {
+                    const deleteBtn = createEl('button', { className: 'delete-theme-btn', textContent: '×' });
+                    deleteBtn.onclick = async (e) => {
+                        e.stopPropagation();
+                        if (await confirmAction(`Delete theme "${theme.name}"?`)) {
+                            userThemes = userThemes.filter(t => t.name !== theme.name);
+                            saveUserThemes();
+                            renderThemeList(container);
+                        }
+                    };
+                    card.appendChild(deleteBtn);
+                }
+                container.appendChild(card);
+            });
+        };
+        renderThemeList(themeList);
+
+        const actions = createEl('div', { className: 'actions' });
+        const rightActions = createEl('div', { className: 'right-actions' });
+        const loadBtn = createEl('button', { className: 'btn', textContent: 'Load Theme' });
+        const closeBtn = createEl('button', { className: 'btn ghost', textContent: 'Close' });
+        loadBtn.onclick = () => {
+            const input = createEl('input', { type: 'file', accept: '.json' });
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async (event) => {
+                    try {
+                        const newTheme = JSON.parse(event.target.result);
+                        if (newTheme.name && newTheme.colors && !getThemeByName(newTheme.name)) {
+                            userThemes.push(newTheme);
+                            saveUserThemes();
+                            renderThemeList(themeList);
+                        } else { await confirmAction('Invalid theme file format or theme with this name already exists.'); }
+                    } catch (err) { await confirmAction('Could not read theme file.'); }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        };
+        closeBtn.onclick = hideOverlay;
+        rightActions.append(loadBtn, closeBtn);
+        actions.append(createEl('div'), rightActions);
+        modal.append(themeList, actions);
+        showOverlay(modal);
+      }
+
+      /* ===== Drag and Drop ===== */
+      let draggedBookId = null;
+      let sourceShelfId = null;
+
+      function initDragAndDrop() {
+          document.querySelectorAll('.book').forEach(book => {
+              book.addEventListener('dragstart', handleDragStart);
+              book.addEventListener('dragend', handleDragEnd);
+          });
+          document.querySelectorAll('.shelf-body').forEach(shelfBody => {
+              shelfBody.addEventListener('dragover', handleDragOver);
+              shelfBody.addEventListener('dragleave', handleDragLeave);
+              shelfBody.addEventListener('drop', handleDrop);
+          });
+      }
+
+      function handleDragStart(e) {
+          draggedBookId = e.target.dataset.bookId;
+          sourceShelfId = e.target.closest('.shelf-body').dataset.shelfId;
+          e.dataTransfer.effectAllowed = 'move';
+          setTimeout(() => e.target.classList.add('dragging'), 0);
+      }
+
+      function handleDragEnd(e) {
+          e.target.classList.remove('dragging');
+          draggedBookId = null;
+          sourceShelfId = null;
+          document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+      }
+
+      function handleDragOver(e) {
+          e.preventDefault();
+          e.currentTarget.classList.add('drag-over');
+      }
+
+      function handleDragLeave(e) {
+          e.currentTarget.classList.remove('drag-over');
+      }
+
+      function handleDrop(e) {
+          e.preventDefault();
+          const targetShelfId = e.currentTarget.dataset.shelfId;
+          if (draggedBookId && sourceShelfId && targetShelfId) {
+              moveBook(draggedBookId, sourceShelfId, targetShelfId);
+          }
+      }
+
+      function moveBook(bookId, fromShelfId, toShelfId) {
+          modifyState(s => {
+              const bs = s.bookshelves[s.active];
+              let bookToMove = null;
+              let fromShelf = bs.shelves.find(sh => sh.id === fromShelfId);
+              if (!fromShelf) return;
+
+              const bookIndex = fromShelf.books.findIndex(b => b.id === bookId);
+              if (bookIndex > -1) {
+                  bookToMove = fromShelf.books.splice(bookIndex, 1)[0];
+              }
+
+              if (bookToMove) {
+                  const toShelf = bs.shelves.find(sh => sh.id === toShelfId);
+                  if (toShelf) {
+                      toShelf.books.push(bookToMove);
+                  } else {
+                      fromShelf.books.splice(bookIndex, 0, bookToMove); // Put it back if target not found
+                  }
+              }
+          });
+      }
+
+      /* ===== Event Listeners ===== */
+      document.getElementById('menuBtn').onclick = function(e) {
+        e.stopPropagation();
+        document.getElementById('menuDropdown').classList.toggle('show');
+      };
+      window.onclick = function() {
+        document.getElementById('menuDropdown').classList.remove('show');
+      }
+      globalSearch.addEventListener('input', () => render());
+      document.getElementById('saveBtn').onclick = saveToFile;
+      document.getElementById('loadBtn').onclick = loadFromFile;
+      document.getElementById('updateBtn').onclick = updateApp;
+      document.getElementById('themesBtn').onclick = showThemesModal;
+
+      window.addEventListener('keydown', e => {
+          if (e.key.toLowerCase() === 'n' && !overlay.classList.contains('show') && !e.target.matches('input, textarea')) {
+              e.preventDefault();
+              const currentBS = state.bookshelves[state.active];
+              if (currentBS && currentBS.shelves.length > 0) {
+                  main.querySelector('.add-book-btn')?.click();
+              } else {
+                  confirmAction("Create a shelf first to add a new book!");
+              }
+          }
+          if (e.key === 'Escape' && overlay.classList.contains('show')) {
+              hideOverlay();
+          }
       });
-    }
+
+      /* ===== Init ===== */
+      loadFromStorage();
+      loadUserThemes();
+      applyTheme(getThemeByName(state.activeTheme));
+      render();
+    })();
   </script>
 </body>
 </html>
+
