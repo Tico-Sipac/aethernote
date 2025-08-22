@@ -1,10 +1,11 @@
-const CACHE_NAME = 'aethernote-cache-v2'; // Incremented version
+const CACHE_NAME = 'aethernote-cache-v3'; // Incremented version for updates
 const URLS_TO_CACHE = [
   './',
   './index.html',
+  './manifest.json',
   // Add paths to your icons here if they are essential for the offline experience
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  './iicon-192.png',
+  './icon-512.png'
 ];
 
 // Install: Caches core assets
@@ -12,7 +13,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Service Worker: Caching app shell');
         return cache.addAll(URLS_TO_CACHE);
       })
   );
@@ -27,6 +28,7 @@ self.addEventListener('activate', event => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Service Worker: Deleting old cache', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -51,7 +53,9 @@ self.addEventListener('fetch', event => {
           return response;
         }
 
-        // Not in cache - fetch from network
+        // Not in cache - fetch from network.
+        // We don't cache new requests here to keep the cache clean.
+        // The cache is only populated on install.
         return fetch(event.request);
       })
     );
