@@ -4,7 +4,7 @@ const URLS_TO_CACHE = [
   './index.html',
   './manifest.json',
   // Add paths to your icons here if they are essential for the offline experience
-  './iicon-192.png',
+  './icon-192.png',
   './icon-512.png'
 ];
 
