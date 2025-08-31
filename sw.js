@@ -1,14 +1,12 @@
-const CACHE_NAME = 'aethernote-cache-v6'; // Note: Increased version to force update
+const CACHE_NAME = 'aethernote-cache-v5.1';
 const URLS_TO_CACHE = [
   './',
-
   './index.html',
-  './themes.json',
+  './themes.json', // Single theme file
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap',
-  'https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2' // Caching the font file directly
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap'
 ];
 
 // Install: Caches core assets
@@ -37,51 +35,62 @@ self.addEventListener('activate', event => {
         })
       );
     })
-    .then(() => self.clients.claim())
   );
+  return self.clients.claim();
 });
 
-// Fetch: Implements a Network-first, falling back to cache strategy for offline support
+// Fetch: Serves assets from cache, falling back to network
 self.addEventListener('fetch', event => {
-  // We only care about GET requests.
-  if (event.request.method !== 'GET') {
+  if (event.request.method !== 'GET') return;
+  
+  // Handle theme file with network-first strategy
+  if (event.request.url.includes('themes.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Cache the theme file for offline use
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, responseClone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
     return;
   }
-
-  // For all GET requests, try the network first.
+  
+  // Handle Google Fonts
+  if (event.request.url.includes('fonts.googleapis.com') || 
+      event.request.url.includes('fonts.gstatic.com')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(response => {
+          if (response) return response;
+          
+          return fetch(event.request).then(networkResponse => {
+            // Cache the font response
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseClone));
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          // Fallback to default font if both cache and network fail
+          return new Response('body { font-family: system-ui, sans-serif; }', {
+            headers: { 'Content-Type': 'text/css' }
+          });
+        })
+    );
+    return;
+  }
+  
+  // For all other requests, use cache-first strategy
   event.respondWith(
-    fetch(event.request)
-      .then(networkResponse => {
-        // If we get a valid response, clone it, cache it, and return it.
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME)
-          .then(cache => {
-            cache.put(event.request, responseToCache);
-          });
-        return networkResponse;
-      })
-      .catch(() => {
-        // If the network request fails (user is offline), try to get it from the cache.
-        return caches.match(event.request)
-          .then(cachedResponse => {
-            // If the request is in the cache, return the cached version.
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-
-            // IMPORTANT: If the offline user is trying to open the app page itself,
-            // and it's not in the cache for some reason, serve the main index.html file.
-            // This is the key to making the PWA load offline.
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
-            }
-            
-            // If the asset is not in the cache and the network is down, we can't do anything.
-            return new Response("Content is not available offline.", {
-              status: 404,
-              statusText: "Not Found"
-            });
-          });
+    caches.match(event.request)
+      .then(response => {
+        if (response) return response;
+        return fetch(event.request);
       })
   );
 });

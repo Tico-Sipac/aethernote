@@ -256,8 +256,16 @@
       .shelf-tabs .stack{ flex-direction:row; gap:10px; padding:12px; overflow:auto; background: linear-gradient(to top, var(--panel-24), var(--panel-16)); border-radius: var(--r-md) var(--r-md) 0 0; }
       .tab-btn{ min-height:56px; min-width:76px; }
       main { padding: 16px; padding-bottom: 110px; }
-      .shelf-body{ grid-template-columns: repeat(3, 1fr); }
-      .book, .book-add{ height: 150px; font-size: 14px; padding: 12px; }
+            .shelf-body{ 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 10px; /* This reduces the space between books from 16px to 10px */
+      }
+      .book, .book-add{ 
+        height: auto; /* Allow height to be determined by the aspect ratio */
+        aspect-ratio: 1 / 1.4; /* Enforces the exact ratio you want */
+        font-size: 14px; 
+        padding: 12px; 
+      }
       .shelf-wrap { position: relative !important; width: 100% !important; left: auto !important; top: auto !important; opacity: 1 !important; }
       .overlay { align-items: flex-start; padding-top: 5vh; }
       .modal { max-height: 85vh; }
