@@ -64,7 +64,7 @@
     .brand{font-weight:800; letter-spacing:0.4px; font-size:20px}
     .search{ flex:1; display:flex; gap:10px; justify-content:flex-end; }
     .search input{
-      width:min(620px,100%); padding:10px 40px 10px 16px; border-radius:var(--r-sm);
+      width:min(620px,100%); padding:10px 16px; border-radius:var(--r-sm);
       border: var(--border-thickness) solid rgba(255,255,255,0.14);
       background: var(--panel-10); color:var(--ink); outline:none;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
@@ -223,7 +223,15 @@
       padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;
     }
     .tag-item .delete-tag { cursor: pointer; font-weight: 900; }
-    .theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; /* Add these two lines */ max-height: 50vh; /* Or a value that you find suitable, like 60vh */ overflow-y: auto; }
+    .theme-list { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+  gap: 10px; 
+  margin-top: 10px; 
+  /* Add these two lines */
+  max-height: 50vh; /* Or a value that you find suitable, like 60vh */
+  overflow-y: auto;
+}
     .theme-card { padding: 12px; border-radius: var(--r-sm); cursor: pointer; border: 2px solid transparent; transition: border .2s ease; position: relative; }
     .theme-card.active { border-color: var(--accent); }
     .theme-card h4 { margin: 0 0 8px 0; font-size: 14px; }
@@ -293,10 +301,7 @@
   <div id="aurora-bg"></div>
   <header>
     <div class="brand">Aethernote</div>
-    <div class="search" style="position: relative;">
-  <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." />
-  <button id="clearSearchBtn" class="clear-search-btn" style="display: none;" title="Clear search">&times;</button>
-</div>
+    <div class="search"> <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." /> </div>
     <div class="header-menu">
       <button id="menuBtn" class="btn icon-only" title="Menu"></button>
       <div id="menuDropdown" class="dropdown-content">
@@ -320,25 +325,7 @@
             .catch(err => console.log('Service Worker registration failed: ', err));
         });
       }
-      .clear-search-btn {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      border: none;
-      background: none;
-      color: var(--accent);
-      font-size: 24px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 0 8px;
-      line-height: 1;
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
-    }
-    .clear-search-btn:hover {
-      opacity: 1;
-    }
+      
       const APP_KEY = 'aethernote.v9-advanced-theming';
       const THEMES_KEY = 'aethernote.themes.v3';
       let state = { bookshelves: [], active: 0, activeTheme: 'Cyber Glow' };
@@ -1066,29 +1053,35 @@
         input.click();
       }
       
-async function updateApp() {
+      async function updateApp() {
         try {
+          // Clear all caches
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(key => caches.delete(key)));
+          
+          // Update service worker
           if ('serviceWorker' in navigator) {
-            // Unregister all service workers. This forces the browser to fetch a new one on reload.
             const registrations = await navigator.serviceWorker.getRegistrations();
             for (let registration of registrations) {
               await registration.unregister();
             }
-            console.log('Service Workers unregistered.');
+            
+            // Re-register service worker
+            await navigator.serviceWorker.register('./sw.js');
           }
-
-          // Clear all caches. This removes all the old app files (index.html, themes.json, etc.).
-          const cacheKeys = await caches.keys();
-          await Promise.all(cacheKeys.map(key => caches.delete(key)));
-          console.log('All caches cleared.');
-
-          // Alert the user and reload the page.
-          alert('Aethernote has been updated! The app will now reload.');
+          
+          // Clear all stored data except user themes
+          const savedThemes = localStorage.getItem(THEMES_KEY);
+          localStorage.clear();
+          if (savedThemes) {
+            localStorage.setItem(THEMES_KEY, savedThemes);
+          }
+          
+          // Reload the page
           window.location.reload();
-
         } catch (error) {
           console.error('Update failed:', error);
-          alert('The update failed. Please try reloading the page manually.');
+          window.location.reload(); // Fallback to simple reload
         }
       }
 
@@ -1109,27 +1102,7 @@ async function updateApp() {
         document.getElementById('updateBtn').innerHTML = `<span class="icon">${icons.update}</span> Update`;
         document.getElementById('menuBtn').onclick = function(e) { e.stopPropagation(); document.getElementById('menuDropdown').classList.toggle('show'); };
         window.onclick = () => document.getElementById('menuDropdown').classList.remove('show');
- const clearSearchBtn = document.getElementById('clearSearchBtn');
-        
-        globalSearch.addEventListener('input', () => {
-          render(); // This was the original line, it stays.
-          
-          // NEW: Show the button only if there is text
-          if (globalSearch.value.length > 0) {
-            clearSearchBtn.style.display = 'block';
-          } else {
-            clearSearchBtn.style.display = 'none';
-          }
-        });
-
-        // NEW: Add a click listener to the button
-        clearSearchBtn.addEventListener('click', () => {
-          globalSearch.value = ''; // Clear the input
-          clearSearchBtn.style.display = 'none'; // Hide the button
-          render(); // Re-render the UI to show all notes
-          globalSearch.focus(); // Put the cursor back in the search bar
-        });
-        
+        globalSearch.addEventListener('input', () => render());
         document.getElementById('saveBtn').onclick = saveToFile;
         document.getElementById('loadBtn').onclick = loadFromFile;
         document.getElementById('updateBtn').onclick = updateApp;
