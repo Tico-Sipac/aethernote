@@ -8,346 +8,223 @@
   <meta name="theme-color" content="#0d0221"/>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
-      /* Default Theme: Cyber Glow */
-      --bg-1: #0d0221;      /* Deep space purple */
-      --bg-2: #24174d;      /* Richer violet */
-      --accent: #00d5ff;    /* Intense cyan accent */
-      --ink: #f0f0f0;       /* Slightly off-white for text */
+      /* Default Theme values - these will be controlled by the theme engine */
+      --bg-1: #0d0221;      
+      --bg-2: #24174d;      
+      --accent: #00d5ff;    
+      --ink: #f0f0f0;       
       --ink-dim:#a0a0a0;
-      --panel-10: rgba(255,255,255,0.10);
-      --panel-16: rgba(255,255,255,0.16);
-      --panel-24: rgba(255,255,255,0.24);
-      --r-sm:8px;
-      --r-md:10px;
+      --panel-10: rgba(255,255,255,0.08);
+      --panel-16: rgba(255,255,255,0.12);
+      --panel-24: rgba(255,255,255,0.20);
+      --r-sm:10px;
+      --r-md:12px;
+      --border-thickness: 1px;
+      --shadow-1: 0 8px 30px rgba(0,0,0,0.4);
+      --shadow-inset: inset 0 0 0 1px rgba(255,255,255,0.1);
       --noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='table' tableValues='0 0 0.03 0.06 0.03 0'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.25'/></svg>");
-      --shadow-1: 0 6px 20px rgba(0,0,0,0.35);
-      --shadow-inset: inset 0 0 0 1px rgba(255,255,255,0.08);
     }
 
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial;
+      font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial;
       color:var(--ink);
-      background: linear-gradient(160deg, var(--bg-1), var(--bg-2));
+      background-color: var(--bg-1);
       overflow-x:hidden;
       transition: background .3s ease;
+      position: relative;
     }
-
-    /* ===== Header ===== */
+    #aurora-bg {
+      position: fixed; inset: 0; z-index: -1;
+      background: radial-gradient(ellipse at top left, var(--accent), transparent 50%), radial-gradient(ellipse at bottom right, var(--bg-2), transparent 50%);
+      background-size: 200% 200%; opacity: 0.3; animation: aurora 30s ease-in-out infinite;
+    }
     header{
-      position:sticky; top:0; z-index:20;
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      padding:12px 16px;
-      background: var(--panel-16);
-      backdrop-filter: blur(10px) saturate(1.05);
-      -webkit-backdrop-filter: blur(10px) saturate(1.05);
-      border-bottom:1px solid rgba(255,255,255,0.14);
-      border-radius: 0 0 var(--r-sm) var(--r-sm);
-      box-shadow: var(--shadow-1);
+      position:sticky; top:0; z-index:20; display:flex; gap:16px; align-items:center; justify-content:space-between;
+      padding:16px 24px; background: linear-gradient(to bottom, var(--panel-24), var(--panel-16));
+      backdrop-filter: blur(12px) saturate(1.2); -webkit-backdrop-filter: blur(12px) saturate(1.2);
+      border-bottom: var(--border-thickness) solid rgba(255,255,255,0.14);
+      border-radius: 0 0 var(--r-md) var(--r-md); box-shadow: var(--shadow-1);
     }
     header::after{
-      content:""; position:absolute; inset:0; pointer-events:none; border-radius: 0 0 var(--r-sm) var(--r-sm);
-      background-image: var(--noise);
-      opacity:.25;
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius: 0 0 var(--r-md) var(--r-md);
+      background-image: var(--noise); opacity:.15;
     }
     .brand{font-weight:800; letter-spacing:0.4px; font-size:20px}
-    .search{
-      flex:1; display:flex; gap:10px; justify-content:flex-end;
-    }
+    .search{ flex:1; display:flex; gap:10px; justify-content:flex-end; }
     .search input{
-      width:min(620px,100%);
-      padding:10px 12px; border-radius:var(--r-sm);
-      border:1px solid rgba(255,255,255,0.14);
-      background: var(--panel-10);
-      color:var(--ink); outline:none;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      width:min(620px,100%); padding:10px 16px; border-radius:var(--r-sm);
+      border: var(--border-thickness) solid rgba(255,255,255,0.14);
+      background: var(--panel-10); color:var(--ink); outline:none;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .search input::placeholder { color: var(--ink-dim); opacity: 1; }
-
-    /* ===== Header Menu ===== */
     .header-menu { position: relative; display: inline-flex; align-items: center; height: 100%; }
-    #menuBtn { padding: 10px 12px; display: flex; align-items: center; justify-content: center; height: 100%; }
+    .btn.icon-only { padding: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
     .dropdown-content {
-      display: none; position: absolute; right: 0; top: 100%; margin-top: 5px;
-      background-color: var(--bg-2); min-width: 160px; box-shadow: var(--shadow-1);
-      border-radius: var(--r-sm); z-index: 1; padding: 8px; border: 1px solid rgba(255, 255, 255, 0.18);
+      display: none; position: absolute; right: 0; top: 100%; margin-top: 8px;
+      background-color: var(--bg-2); min-width: 180px; box-shadow: var(--shadow-1);
+      border-radius: var(--r-sm); z-index: 1; padding: 8px; border: var(--border-thickness) solid rgba(255, 255, 255, 0.18);
+      animation: fadeIn 0.2s ease;
     }
-    .dropdown-content button { width: 100%; text-align: left; margin-bottom: 4px; padding: 8px 12px; }
+    .dropdown-content button { width: 100%; text-align: left; margin-bottom: 4px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
     .dropdown-content button:last-child { margin-bottom: 0; }
     .dropdown-content.show { display: block; }
-
-    /* ===== Floating bookshelf tabs ===== */
+    .dropdown-content .icon { width: 16px; height: 16px; }
     .shelf-tabs{
-      position:fixed; left:12px; top:96px; bottom:96px; width:84px;
-      display:flex; flex-direction:column; gap:10px; align-items:stretch;
+      position:fixed; left:16px; top:112px; bottom:112px; width:90px;
+      display:flex; flex-direction:column; gap:12px; align-items:stretch;
       z-index:15; pointer-events:none;
     }
     .shelf-tabs .stack{
-      overflow:auto; display:flex; flex-direction:column; gap:10px; padding-right:6px; pointer-events:auto;
+      overflow:auto; display:flex; flex-direction:column; gap:12px; padding: 6px; pointer-events:auto;
       background: var(--panel-10); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      border:1px solid rgba(255,255,255,0.10); border-radius: var(--r-sm);
+      border: var(--border-thickness) solid rgba(255,255,255,0.10); border-radius: var(--r-md);
     }
     .tab-btn{
-      border:none; cursor:pointer; border-radius: var(--r-sm); padding:10px 8px; min-height:56px;
+      border:none; cursor:pointer; border-radius: var(--r-sm); padding:10px 8px; min-height:60px;
       color:var(--ink); background: var(--panel-10); box-shadow: var(--shadow-inset);
       display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
       transition:transform .15s ease, box-shadow .15s ease, background .2s ease;
       word-break:break-word; font-weight:700; font-size:12px; position:relative;
     }
-    .tab-btn.active{
-      background: var(--accent) !important; color: var(--bg-1) !important;
-      box-shadow: var(--shadow-1); outline: none; border: none;
-    }
-    .tab-btn.add{ font-size:20px; font-weight:900; }
-
-    @media (max-width: 720px){
-      .shelf-tabs{ left:0; right:0; width:auto; top:auto; bottom:0; height:78px; display:block;}
-      .shelf-tabs .stack{ flex-direction:row; gap:10px; padding:10px; overflow:auto; background: var(--panel-16); border-radius: var(--r-sm) var(--r-sm) 0 0; }
-      .tab-btn{ min-height:52px; min-width:72px; }
-    }
-
-    /* ===== Main area ===== */
-    main{ 
-      padding:16px; 
-      padding-left: 116px; /* Space for side tabs */
-      padding-bottom:110px; 
-      position: relative;
-    }
-    @media (max-width: 720px){ main{ padding:12px; padding-bottom:106px; padding-left:12px; } }
-
-    /* ===== Bookshelf header ===== */
+    .tab-btn:hover { box-shadow: var(--shadow-inset), 0 0 12px 1px var(--accent); transform: translateY(-2px); }
+    .tab-btn.active{ background: var(--accent) !important; color: var(--bg-1) !important; box-shadow: var(--shadow-1); outline: none; border: none; }
+    .tab-btn.add .icon { width: 20px; height: 20px; }
+    main{ padding: 24px; padding-left: 130px; padding-bottom:110px; position: relative; }
     .bs-header{
-      display:flex; flex-wrap:wrap; align-items:center; gap:10px;
-      padding:12px 14px; border-radius: var(--r-sm); margin-bottom:14px;
-      background: var(--panel-16); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      border:1px solid rgba(255,255,255,0.12); box-shadow: var(--shadow-1); position:relative;
+      display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:16px 20px; border-radius: var(--r-md); margin-bottom:24px;
+      background: linear-gradient(to bottom, var(--panel-16), var(--panel-10)); 
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: var(--border-thickness) solid rgba(255,255,255,0.12); box-shadow: var(--shadow-1); position:relative;
     }
-    .bs-header::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.25; pointer-events:none; }
+    .bs-header::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.15; pointer-events:none; }
     .bs-title{ font-weight:800; letter-spacing:0.3px; flex-grow:1; cursor:pointer; }
     .bs-controls{ display:flex; gap:10px; }
     .btn-header{
-      border:1px solid rgba(255,255,255,0.16); padding:10px 12px; border-radius: var(--r-sm);
+      border: var(--border-thickness) solid rgba(255,255,255,0.16); padding:10px 14px; border-radius: var(--r-sm);
       background: var(--panel-10); color:var(--ink); cursor:pointer; font-weight:700;
+      display: flex; align-items: center; gap: 8px;
     }
-    
-    /* ===== Shelf Container (for positioning context) ===== */
-    #shelfContainer {
-      position: relative;
-    }
-
-    /* ===== Shelf bar and body ===== */
+    .btn-header .icon { width: 16px; height: 16px; }
+    #shelfContainer { position: relative; }
     .shelf-wrap{ 
-      margin-bottom:18px; 
-      position: absolute; /* Positioned by JS */
+      margin-bottom:24px; position: absolute;
       transition: top 0.3s ease, left 0.3s ease, opacity 0.3s ease;
-      width: 380px;
+      width: 380px; animation: fadeIn 0.4s ease forwards;
     }
     .shelf-bar{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:10px 12px; border-radius: var(--r-sm); color:var(--ink); font-weight:800; letter-spacing:0.2px;
-      background: var(--panel-16); border:1px solid rgba(255,255,255,0.12);
+      display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px; border-radius: var(--r-sm); color:var(--ink); font-weight:800; letter-spacing:0.2px;
+      background: linear-gradient(to bottom, var(--panel-16), var(--panel-10)); 
+      border: var(--border-thickness) solid rgba(255,255,255,0.12);
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
       box-shadow: var(--shadow-inset), var(--shadow-1); position:relative;
     }
-    .shelf-bar::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.25; pointer-events:none; }
+    .shelf-bar::after{ content:""; position:absolute; inset:0; border-radius: inherit; background-image: var(--noise); opacity:.15; pointer-events:none; }
     .shelf-name{ flex-grow:1; cursor:pointer; }
     .shelf-controls{ display:flex; gap:8px; align-items:center; }
     .btn-shelf{
-      cursor:pointer; border:1px solid rgba(255,255,255,0.14);
-      background: var(--panel-10); color:var(--ink); padding: 10px;
-      min-width: 40px; border-radius: var(--r-sm); font-weight:900; font-size: 14px;
+      cursor:pointer; border: var(--border-thickness) solid rgba(255,255,255,0.14);
+      background: var(--panel-10); color:var(--ink); padding: 0;
+      width: 40px; height: 40px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
     }
+    .btn-shelf .icon { width: 18px; height: 18px; }
     .add-book-btn{
-      cursor:pointer; border:1px solid rgba(255,255,255,0.16);
-      padding:8px 10px; border-radius: var(--r-sm); font-weight:800; color:var(--ink); background:var(--panel-10);
-      min-width:40px; min-height:36px; display:flex; align-items:center; justify-content:center; font-size:18px;
+      cursor:pointer; border: var(--border-thickness) solid rgba(255,255,255,0.16);
+      padding:0; border-radius: var(--r-sm); color:var(--ink); background:var(--panel-10);
+      width:40px; height:40px; display:flex; align-items:center; justify-content:center;
     }
-    .delete-btn{ background: var(--panel-16); color:var(--ink); border:1px solid rgba(255,255,255,0.18); }
-
+    .add-book-btn .icon { width: 20px; height: 20px; }
     .shelf-body{
-      margin-top:10px; padding:10px; border-radius: var(--r-sm); background: var(--panel-10);
-      display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; border:1px solid rgba(255,255,255,0.1);
+      margin-top:16px; padding:16px; border-radius: var(--r-md); background: var(--panel-10);
+      display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; border: var(--border-thickness) solid rgba(255,255,255,0.1);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); position:relative;
     }
-    .shelf-body::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25; border-radius: inherit; pointer-events:none; }
-
-    /* ===== Book cards - UPDATED ===== */
+    .shelf-body::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.15; border-radius: inherit; pointer-events:none; }
     .book, .book-add{
-      width:100%; 
-      border-radius: var(--r-sm); color:#fff; font-weight:900;
-      display:flex; 
-      align-items: flex-start; /* Aligned to top */
+      width:100%; border-radius: var(--r-sm); color:#fff; font-weight:700;
+      display:flex; align-items: flex-start;
       justify-content:center; text-align:center; cursor:pointer; 
-      box-shadow: var(--shadow-1), var(--shadow-inset); transition: transform .15s ease, box-shadow .15s ease;
-      position:relative;
-      /* FIX: Wider text area by adjusting padding */
-      padding: 12px 8px 8px 18px; 
-      white-space: normal; word-break: break-word; line-height: 1.2;
-      font-size: 16px;
+      box-shadow: var(--shadow-1), var(--shadow-inset); transition: transform .2s ease, box-shadow .2s ease;
+      position:relative; padding: 12px 8px 8px 22px; 
+      white-space: normal; word-break: break-word; line-height: 1.3;
+      font-size: 15px; animation: fadeIn 0.4s ease forwards;
     }
-    .book:hover{ transform: translateY(-2px) scale(1.02); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 0 4px rgba(255,255,255,0.06) }
+    .book:hover{ transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 12px 2px var(--accent); }
     .book::before{
-      content:""; position:absolute; left:6px; top:8px; bottom:8px; width:6px;
-      background: rgba(0,0,0,0.18); border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+      content:""; position:absolute; left:8px; top:10px; bottom:10px; width:6px;
+      background: rgba(0,0,0,0.2); border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
     }
-    .book-add{ 
-        font-size:28px; 
-        align-items:center; /* Center the '+' */
-        padding:0; 
-    }
-
-    @media (max-width:720px){
-      .shelf-body{ grid-template-columns: repeat(3, 1fr); }
-      .book, .book-add{ 
-        height: 150px;
-        font-size: 15px;
-        padding: 12px 12px 8px 24px; /* Revert to original padding on mobile */
-      }
-      .shelf-wrap {
-        position: relative !important; /* Override absolute positioning */
-        width: 100% !important;
-        left: auto !important;
-        top: auto !important;
-        opacity: 1 !important;
-      }
-    }
-    
-    @media (min-width: 721px) {
-      .book, .book-add {
-        height: auto; /* Remove fixed height on desktop */
-        aspect-ratio: 1 / 1.4; /* Enforce aspect ratio */
-      }
-    }
-
-    /* Shelf shortcut indicator */
+    .book-add{ align-items:center; padding:0; }
+    .book-add .icon { width: 28px; height: 28px; }
     .shelf-shortcut {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: var(--bg-1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      font-size: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      z-index: 5;
+      position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
+      border-radius: 50%; background: var(--accent); color: var(--bg-1);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 5;
     }
-
-    /* ===== Modal / prompts ===== */
     .overlay{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:16px; z-index:30; background: radial-gradient(1200px 800px at 50% 20%, rgba(0,0,0,0.55), rgba(0,0,0,0.7)); }
     .overlay.show{ display:flex }
     .modal{
-      width:min(720px, 96%); background: var(--panel-16);
-      border:1px solid rgba(255,255,255,0.18); border-radius: var(--r-md); padding:12px; color:var(--ink);
-      box-shadow: 0 30px 80px rgba(0,0,0,0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position:relative;
-      display: flex;
-      flex-direction: column;
-      max-height: 90vh;
+      width:min(720px, 96%); background: linear-gradient(to bottom, var(--panel-24), var(--panel-16));
+      border: var(--border-thickness) solid rgba(255,255,255,0.18); border-radius: var(--r-md); padding:16px; color:var(--ink);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.45); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position:relative;
+      display: flex; flex-direction: column; max-height: 90vh;
+      animation: scaleUp 0.3s ease;
     }
-    .modal::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25; border-radius: inherit; pointer-events:none; }
-    .modal h3{ margin:0 0 8px 0; font-size:16px; }
-
-    /* Transparent/Noisy inputs */
+    .modal::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.15; border-radius: inherit; pointer-events:none; }
+    .modal h3{ margin:0 0 12px 0; font-size:18px; }
     .modal .input-wrapper { position: relative; }
     .modal .input-wrapper::after{
-      content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.25;
+      content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.15;
       background-color: var(--panel-10); border-radius: var(--r-sm); pointer-events:none; z-index: 1;
     }
     .modal textarea, .modal input[type="text"] {
-      width:100%; padding:10px; border-radius: var(--r-sm);
-      border: 1px solid rgba(255,255,255,0.1); background: transparent; color:var(--ink); outline: none;
+      width:100%; padding:12px; border-radius: var(--r-sm);
+      border: var(--border-thickness) solid rgba(255,255,255,0.1); background: transparent; color:var(--ink); outline: none;
       position: relative; z-index: 2;
     }
     .modal textarea::placeholder, .modal input::placeholder { color: var(--ink-dim); opacity: 1; }
-    .modal textarea{ 
-      height:34vh; min-height:140px; max-height:42vh; resize: vertical; 
-      flex-grow: 1; /* Allow textarea to expand */
-    }
-
-    .modal .row{ display:flex; gap:10px; }
-    .modal .actions{ 
-      margin-top:10px; display:flex; gap:10px; justify-content:space-between; align-items:center; 
-      flex-shrink: 0; /* Prevent actions from shrinking */
-    }
+    .modal textarea{ min-height:140px; resize: vertical; flex-grow: 1; }
+    .modal .actions{ margin-top:16px; display:flex; gap:12px; justify-content:space-between; align-items:center; flex-shrink: 0; }
     .modal .actions .left-actions, .modal .actions .right-actions{ display:flex; gap:8px; }
-    .btn{ border:1px solid rgba(255,255,255,0.18); padding:8px 10px; border-radius: var(--r-sm); cursor:pointer; font-weight:800; background: var(--panel-10); color:var(--ink); }
-    .btn.primary{ background:var(--accent); color:var(--bg-1); border-color:rgba(0,0,0,0.1) }
-    .btn.ghost{ background:var(--panel-10); color:var(--ink) }
-    .btn.danger{ background:#e14444; color:#fff; border-color: rgba(0,0,0,0.12) }
-
-    /* Inline edit inputs */
-    .shelf-name input, .bs-title input {
-      background: transparent; border: none; color: inherit; font: inherit;
-      width: 100%; outline: none; padding: 0; margin: 0;
+    .btn{ 
+      border: var(--border-thickness) solid rgba(255,255,255,0.18); padding:10px 14px; border-radius: var(--r-sm); 
+      cursor:pointer; font-weight:700; background: var(--panel-10); color:var(--ink);
+      transition: transform .15s ease, box-shadow .15s ease;
     }
-
-    /* Note editor buttons - consistent sizing */
+    .btn:hover { box-shadow: 0 0 12px 1px var(--accent); transform: translateY(-2px); }
+    .btn.primary{ background:var(--accent); color:var(--bg-1); border-color:rgba(0,0,0,0.1) }
+    .btn.danger{ background:#e14444; color:#fff; border-color: rgba(0,0,0,0.12) }
     .modal .actions .btn.icon-btn {
-      width: 40px; height: 40px; display: flex;
+      width: 44px; height: 44px; display: flex;
       align-items: center; justify-content: center; padding: 0;
     }
-    /* Regular modal buttons (not in note editor) */
-    .modal .right-actions .btn:not(.icon-btn) {
-      width: auto; height: auto; padding: 8px 10px;
-    }
-
-    /* Tagging UI - UPDATED */
-    .tags-section { 
-      margin-top: 12px; 
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .tags-input-wrapper { 
-      display: flex; 
-      gap: 8px; 
-      align-items: center;
-    }
-    .tags-input-wrapper input { 
-      flex-grow: 1; 
-      width: auto; 
-      min-width: 120px;
-    }
-    .tags-display { 
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 6px; 
-      padding: 4px; 
-      min-height: 28px; 
-    }
+    .modal .actions .btn.icon-btn .icon { width: 20px; height: 20px; }
+    .modal .right-actions .btn:not(.icon-btn) { width: auto; height: auto; padding: 10px 14px; }
+    .tags-section { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+    .tags-input-wrapper { display: flex; gap: 8px; align-items: center; }
+    .tags-input-wrapper input { flex-grow: 1; width: auto; min-width: 120px; }
+    .tags-display { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px; min-height: 28px; }
     .tag-item {
       background: var(--accent); color: var(--bg-1); font-size: 12px; font-weight: 700;
       padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; gap: 6px;
     }
     .tag-item .delete-tag { cursor: pointer; font-weight: 900; }
-    
-    /* Global Tags Modal */
-    .global-tags-list {
-        display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
-        max-height: 50vh; overflow-y: auto;
-    }
-    .global-tags-list .tag-btn {
-        background: var(--panel-16); color: var(--ink); border: 1px solid rgba(255,255,255,0.1);
-        padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer;
-    }
-
-    /* Themes Modal */
     .theme-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
-    .theme-card {
-      padding: 12px; border-radius: var(--r-sm); cursor: pointer;
-      border: 2px solid transparent; transition: border .2s ease;
-      position: relative;
-    }
+    .theme-card { padding: 12px; border-radius: var(--r-sm); cursor: pointer; border: 2px solid transparent; transition: border .2s ease; position: relative; }
     .theme-card.active { border-color: var(--accent); }
     .theme-card h4 { margin: 0 0 8px 0; font-size: 14px; }
     .theme-swatches { display: flex; gap: 4px; }
@@ -357,86 +234,95 @@
       background: rgba(0,0,0,0.3); color: #fff; border: none; border-radius: 50%;
       cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-
-    /* Drag and Drop styles */
+    .global-tags-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 50vh; overflow-y: auto; }
+    .global-tags-list .tag-btn { background: var(--panel-16); color: var(--ink); border: var(--border-thickness) solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer; }
     .dragging { opacity: 0.5; }
     .drag-over { border: 2px dashed var(--accent); background-color: rgba(0, 213, 255, 0.1); }
-
-    /* Mobile Modal Adjustments - UPDATED */
-    @media (max-width: 720px) {
-        .overlay {
-            align-items: flex-start; /* Align to top */
-            padding-top: 5vh;
-        }
-        .modal {
-            height: auto; /* Auto height */
-            max-height: 85vh; /* Increased height */
-        }
-        .modal textarea {
-            min-height: 40vh; /* Larger textarea on mobile */
-        }
-        .tags-input-wrapper {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-        .tags-input-wrapper input {
-          width: 100%;
-        }
+    
+    /* Icon styling fixes */
+    .icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .btn-header .icon {
+      width: 16px;
+      height: 16px;
+    }
+    .btn-shelf .icon {
+      width: 18px;
+      height: 18px;
+    }
+    .add-book-btn .icon {
+      width: 20px;
+      height: 20px;
+    }
+    .book-add .icon {
+      width: 28px;
+      height: 28px;
+    }
+    .tab-btn.add .icon {
+      width: 20px;
+      height: 20px;
+    }
+    
+    @media (max-width:720px){
+      .shelf-tabs{ left:0; right:0; width:auto; top:auto; bottom:0; height:84px; display:block;}
+      .shelf-tabs .stack{ flex-direction:row; gap:10px; padding:12px; overflow:auto; background: linear-gradient(to top, var(--panel-24), var(--panel-16)); border-radius: var(--r-md) var(--r-md) 0 0; }
+      .tab-btn{ min-height:56px; min-width:76px; }
+      main { padding: 16px; padding-bottom: 110px; }
+      .shelf-body{ grid-template-columns: repeat(3, 1fr); }
+      .book, .book-add{ height: 150px; font-size: 14px; padding: 12px 12px 8px 24px; }
+      .shelf-wrap { position: relative !important; width: 100% !important; left: auto !important; top: auto !important; opacity: 1 !important; }
+      .overlay { align-items: flex-start; padding-top: 5vh; }
+      .modal { max-height: 85vh; }
+      .modal textarea { min-height: 40vh; }
+      .tags-input-wrapper { flex-direction: column; align-items: flex-start; }
+      .tags-input-wrapper input { width: 100%; }
+    }
+    @media (min-width: 721px) {
+      .book, .book-add { height: auto; aspect-ratio: 1 / 1.4; }
     }
   </style>
 </head>
 <body>
+  <div id="aurora-bg"></div>
   <header>
     <div class="brand">Aethernote</div>
-    <div class="search">
-      <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." />
-    </div>
+    <div class="search"> <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." /> </div>
     <div class="header-menu">
-      <button id="menuBtn" class="btn" title="Menu">...</button>
+      <button id="menuBtn" class="btn icon-only" title="Menu"></button>
       <div id="menuDropdown" class="dropdown-content">
-        <button class="btn" id="saveBtn" title="Export to File">Save</button>
-        <button class="btn" id="loadBtn" title="Import from File">Load</button>
-        <button class="btn" id="themesBtn" title="Change Theme">Themes</button>
-        <button class="btn" id="tagsBtn" title="View All Tags">Tags</button>
-        <button class="btn" id="updateBtn" title="Force update from server">Update</button>
+        <button class="btn" id="saveBtn" title="Export to File"></button>
+        <button class="btn" id="loadBtn" title="Import from File"></button>
+        <button class="btn" id="themesBtn" title="Change Theme"></button>
+        <button class="btn" id="tagsBtn" title="View All Tags"></button>
+        <button class="btn" id="updateBtn" title="Force update from server"></button>
       </div>
     </div>
   </header>
-
   <div class="shelf-tabs"><div class="stack" id="tabsStack"></div></div>
   <main id="main"></main>
-
   <div class="overlay" id="overlay"></div>
-
   <script>
     (function(){
-      // Register Service Worker for PWA functionality
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
-            .then(registration => console.log('Service Worker registered!'))
+            .then(reg => console.log('Service Worker registered!'))
             .catch(err => console.log('Service Worker registration failed: ', err));
         });
       }
-
-      const BASKETS = [
-        ['#4a90e2','#5dade2','#2874a6','#1b4d97'], ['#d35400','#e67e22','#ca6f1e','#7e5109'],
-        ['#27ae60','#2ecc71','#16a085','#196f3d'], ['#8e44ad','#9b59b6','#c39bd3','#d98880']
-      ];
-      function pickFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-      function pickTwoDifferentIndexes(n){
-        const a = Math.floor(Math.random()*n); let b = Math.floor(Math.random()*n);
-        if(b === a) b = (b+1)%n; return [a,b];
-      }
-      function crossBasketGradient(){
-        const [bi, bj] = pickTwoDifferentIndexes(BASKETS.length);
-        return [pickFrom(BASKETS[bi]), pickFrom(BASKETS[bj])];
-      }
-
-      const APP_KEY = 'aethernote.v6';
-      const THEMES_KEY = 'aethernote.themes.v1';
+      
+      const APP_KEY = 'aethernote.v9-advanced-theming';
+      const THEMES_KEY = 'aethernote.themes.v3';
       let state = { bookshelves: [], active: 0, activeTheme: 'Cyber Glow' };
       let userThemes = [];
+      let systemThemes = [];
       let isModalOpen = false;
 
       const main = document.getElementById('main');
@@ -449,15 +335,25 @@
       function createEl(tag, props = {}) {
         const el = document.createElement(tag);
         Object.entries(props).forEach(([k, v]) => {
-          if (k in el) el[k] = v; else el.setAttribute(k, v);
+          if (k === 'innerHTML') el.innerHTML = v;
+          else if (k in el) el[k] = v; 
+          else el.setAttribute(k, v);
         });
         return el;
       }
 
+      const BASKETS = [
+        ['#4a90e2','#5dade2','#2874a6','#1b4d97'], ['#d35400','#e67e22','#ca6f1e','#7e5109'],
+        ['#27ae60','#2ecc71','#16a085','#196f3d'], ['#8e44ad','#9b59b6','#c39bd3','#d98880']
+      ];
+      function pickFrom(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+      function pickTwoDifferentIndexes(n){ const a = Math.floor(Math.random()*n); let b = Math.floor(Math.random()*n); if(b === a) b = (b+1)%n; return [a,b]; }
+      function crossBasketGradient(){ const [bi, bj] = pickTwoDifferentIndexes(BASKETS.length); return [pickFrom(BASKETS[bi]), pickFrom(BASKETS[bj])]; }
+      
       function normalizeState(s) {
         (s.bookshelves || []).forEach(bs => {
           if (!bs.id) bs.id = newId();
-          (bs.shelves || []).forEach(sh => {
+          (bs.shelves || []).forEach(sh => { 
             if (!sh.id) sh.id = newId();
             if (!sh.addGradient) sh.addGradient = crossBasketGradient();
             (sh.books || []).forEach(bk => {
@@ -468,7 +364,6 @@
           });
         });
       }
-
       function saveToStorage(){ localStorage.setItem(APP_KEY, JSON.stringify(state)); }
       function loadFromStorage(){
         const raw = localStorage.getItem(APP_KEY);
@@ -483,62 +378,36 @@
         if (shouldRender) render();
       }
 
-      /* ===== Custom Masonry Layout Algorithm - FIXED ===== */
       function layoutShelves() {
         const shelfContainer = document.getElementById('shelfContainer');
         if (!shelfContainer) return;
-
-        // On mobile, reset all styles and let CSS handle it
-        if (window.innerWidth < 721) {
+        if (window.innerWidth < 721 || globalSearch.value) {
           shelfContainer.style.height = 'auto';
           shelfContainer.querySelectorAll('.shelf-wrap').forEach(shelf => {
-            shelf.style.position = '';
-            shelf.style.left = '';
-            shelf.style.top = '';
-            shelf.style.width = '';
-            shelf.style.opacity = '';
+            shelf.style.position = ''; shelf.style.left = ''; shelf.style.top = ''; shelf.style.width = ''; shelf.style.opacity = '';
           });
           return;
         }
-
         const shelves = Array.from(shelfContainer.querySelectorAll('.shelf-wrap'));
-        if (shelves.length === 0) {
-            shelfContainer.style.height = '0px';
-            return;
-        }
-        
-        const gap = 18;
-        const shelfWidth = 380;
-        const containerWidth = shelfContainer.offsetWidth;
+        if (shelves.length === 0) { shelfContainer.style.height = '0px'; return; }
+        const gap = 24; const shelfWidth = 380; const containerWidth = shelfContainer.offsetWidth;
         const numColumns = Math.max(1, Math.floor((containerWidth + gap) / (shelfWidth + gap)));
         const columnHeights = new Array(numColumns).fill(0);
-
         shelves.forEach(shelf => {
-          shelf.style.width = shelfWidth + 'px'; // Ensure width is set for height calculation
+          shelf.style.width = shelfWidth + 'px';
           const shelfHeight = shelf.offsetHeight;
-          
           let minColIndex = 0;
-          for (let i = 1; i < numColumns; i++) {
-            if (columnHeights[i] < columnHeights[minColIndex]) {
-              minColIndex = i;
-            }
-          }
-          
-          const left = minColIndex * (shelfWidth + gap);
-          const top = columnHeights[minColIndex];
-          
+          for (let i = 1; i < numColumns; i++) if (columnHeights[i] < columnHeights[minColIndex]) minColIndex = i;
           shelf.style.position = 'absolute';
-          shelf.style.left = left + 'px';
-          shelf.style.top = top + 'px';
+          shelf.style.left = (minColIndex * (shelfWidth + gap)) + 'px';
+          shelf.style.top = columnHeights[minColIndex] + 'px';
           shelf.style.opacity = '1';
-          
           columnHeights[minColIndex] += shelfHeight + gap;
         });
-        
-        const maxHeight = Math.max(...columnHeights);
-        shelfContainer.style.height = maxHeight + 'px';
+        shelfContainer.style.height = Math.max(...columnHeights) + 'px';
       }
-
+      const debouncedLayout = debounce(layoutShelves, 250);
+      window.addEventListener('resize', debouncedLayout);
       function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -547,55 +416,35 @@
           timeout = setTimeout(later, wait);
         };
       }
-      window.addEventListener('resize', debounce(layoutShelves, 250));
-
-      /* ===== Modal Handling ===== */
+      
       function showOverlay(content) {
-        overlay.innerHTML = '';
-        overlay.appendChild(content);
-        overlay.classList.add('show');
-        if (!isModalOpen) {
-          history.pushState({ modal: true }, null);
-          isModalOpen = true;
-        }
+        overlay.innerHTML = ''; overlay.appendChild(content); overlay.classList.add('show');
+        if (!isModalOpen) { history.pushState({ modal: true }, null); isModalOpen = true; }
       }
       function hideOverlay() {
-        overlay.classList.remove('show');
-        overlay.innerHTML = '';
-        if (isModalOpen) {
-          if (history.state && history.state.modal) {
-            history.back();
-          }
-          isModalOpen = false;
-        }
+        overlay.classList.remove('show'); overlay.innerHTML = '';
+        if (isModalOpen) { if (history.state && history.state.modal) history.back(); isModalOpen = false; }
       }
       window.addEventListener('popstate', (event) => {
-        if (isModalOpen) {
-          isModalOpen = false;
-          overlay.classList.remove('show');
-          overlay.innerHTML = '';
-        }
+        if (isModalOpen) { isModalOpen = false; overlay.classList.remove('show'); overlay.innerHTML = ''; }
       });
-
       function promptText(title, placeholder='Name', initial=''){
         return new Promise(resolve => {
           const modal = createEl('div', { className: 'modal' });
           modal.innerHTML = `<h3>${safe(title)}</h3>
             <div class="row input-wrapper"><input type="text" id="promptInput" placeholder="${safe(placeholder)}" value="${safe(initial)}"/></div>
-            <div class="actions"><div></div><div class="right-actions">
+            <div class="actions"><div class="left-actions"></div><div class="right-actions">
               <button class="btn ghost" id="cancelBtn">Cancel</button>
               <button class="btn primary" id="okBtn">OK</button>
             </div></div>`;
           showOverlay(modal);
-          const input = document.getElementById('promptInput');
-          input.focus(); input.select();
+          const input = document.getElementById('promptInput'); input.focus(); input.select();
           const close = (value) => { hideOverlay(); resolve(value); };
           modal.querySelector('#cancelBtn').onclick = () => close(null);
           modal.querySelector('#okBtn').onclick = () => close(input.value.trim() || null);
           input.onkeydown = e => { if(e.key === 'Enter') { e.preventDefault(); modal.querySelector('#okBtn').click(); }};
         });
       }
-
       function confirmAction(message) {
         return new Promise(resolve => {
           const modal = createEl('div', { className: 'modal' });
@@ -610,348 +459,219 @@
           modal.querySelector('#okBtn').onclick = () => close(true);
         });
       }
-
       function editBook(book, bsIndex, shelfIndex, bookIndex){
         const modal = createEl('div', { className: 'modal' });
         modal.innerHTML = `<h3>${safe(book.title)}</h3>`;
-        const textarea = createEl('textarea', { id: 'noteArea', placeholder: 'Write your note (Ctrl+S to save)...' });
+        const textarea = createEl('textarea', { id: 'noteArea', placeholder: 'Write your note...' });
         textarea.value = book.content || '';
         const tagsSection = createEl('div', { className: 'tags-section' });
         const tagsInputWrapper = createEl('div', { className: 'tags-input-wrapper input-wrapper' });
         const tagsInput = createEl('input', { type: 'text', placeholder: 'Add a tag and press Enter...' });
         const tagsDisplay = createEl('div', { className: 'tags-display' });
-        tagsInputWrapper.append(tagsInput);
-        tagsSection.append(tagsInputWrapper, tagsDisplay);
+        tagsInputWrapper.append(tagsInput); tagsSection.append(tagsInputWrapper, tagsDisplay);
         const renderTags = () => {
           tagsDisplay.innerHTML = '';
           (book.tags || []).forEach((tag, tagIndex) => {
             const tagItem = createEl('div', { className: 'tag-item', textContent: tag });
-            const deleteTagBtn = createEl('span', { className: 'delete-tag', textContent: '×', title: 'Remove tag' });
-            deleteTagBtn.onclick = () => { book.tags.splice(tagIndex, 1); saveToStorage(); renderTags(); };
-            tagItem.append(deleteTagBtn);
-            tagsDisplay.append(tagItem);
+            const deleteTagBtn = createEl('span', { className: 'delete-tag', innerHTML: '&times;', title: 'Remove tag' });
+            deleteTagBtn.onclick = () => { book.tags.splice(tagIndex, 1); renderTags(); };
+            tagItem.append(deleteTagBtn); tagsDisplay.append(tagItem);
           });
         };
         renderTags();
-        tagsInput.onkeydown = e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            const newTag = tagsInput.value.trim().toLowerCase();
-            if (newTag && !(book.tags || []).includes(newTag)) {
-              book.tags.push(newTag);
-              saveToStorage();
-              renderTags();
-            }
-            tagsInput.value = '';
-          }
+        const addPendingTag = () => {
+          const newTag = tagsInput.value.trim().toLowerCase();
+          if (newTag && !(book.tags || []).includes(newTag)) { book.tags.push(newTag); renderTags(); }
+          tagsInput.value = '';
         };
+        tagsInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addPendingTag(); }};
         const actions = createEl('div', { className: 'actions' });
         const leftActions = createEl('div', { className: 'left-actions' });
         const rightActions = createEl('div', { className: 'right-actions' });
         actions.append(leftActions, rightActions);
-        const renameBtn = createEl('button', {className: 'btn ghost icon-btn', textContent: '✎', title: 'Rename'});
-        const deleteBtn = createEl('button', {className: 'btn danger icon-btn', textContent: '✕', title: 'Delete'});
-        const closeBtn  = createEl('button', {className: 'btn ghost icon-btn', textContent: '▼', title: 'Close'});
-        const saveBtn   = createEl('button', {className: 'btn primary icon-btn', textContent: '✓', title: 'Save (Ctrl+S)'});
-        leftActions.append(renameBtn, deleteBtn);
-        rightActions.append(closeBtn, saveBtn);
+        const icons = getIconsForTheme(getThemeByName(state.activeTheme));
+        const renameBtn = createEl('button', {className: 'btn ghost icon-btn', title: 'Rename', innerHTML: `<span class="icon">${icons.rename}</span>` });
+        const deleteBtn = createEl('button', {className: 'btn danger icon-btn', title: 'Delete', innerHTML: `<span class="icon">${icons.trash}</span>` });
+        const closeBtn  = createEl('button', {className: 'btn ghost icon-btn', title: 'Close', innerHTML: `<span class="icon">${icons.chevronDown}</span>` });
+        const saveBtn   = createEl('button', {className: 'btn primary icon-btn', title: 'Save', innerHTML: `<span class="icon">${icons.check}</span>` });
+        leftActions.append(renameBtn, deleteBtn); rightActions.append(closeBtn, saveBtn);
         modal.append(textarea, tagsSection, actions);
         showOverlay(modal);
         textarea.focus();
-        const doSave = () => { book.content = textarea.value; saveToStorage(); };
+        const doSaveAndClose = () => {
+          book.content = textarea.value; addPendingTag();
+          modifyState(s => { s.bookshelves[bsIndex].shelves[shelfIndex].books[bookIndex] = book; });
+          hideOverlay();
+        };
         renameBtn.onclick = async () => {
           const newTitle = await promptText('Rename Book', 'New book title', book.title);
-          if (newTitle) {
-            modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books[bookIndex].title = newTitle);
-            modal.querySelector('h3').textContent = newTitle;
-          }
+          if (newTitle) { book.title = newTitle; modal.querySelector('h3').textContent = newTitle; }
         };
-        deleteBtn.onclick = async () => {
-          if (await confirmAction(`Delete "${book.title}"?`)) {
-            hideOverlay();
-            modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.splice(bookIndex, 1));
-          }
-        };
-        closeBtn.onclick = hideOverlay;
-        saveBtn.onclick = () => { doSave(); hideOverlay(); };
-        modal.onkeydown = e => {
-          if (e.ctrlKey && e.key === 's') {
-            e.preventDefault(); doSave();
-            saveBtn.style.transform = 'scale(1.1)';
-            setTimeout(() => saveBtn.style.transform = 'scale(1)', 150);
-          }
-        };
+        deleteBtn.onclick = async () => { if (await confirmAction(`Delete "${book.title}"?`)) {
+            hideOverlay(); modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.splice(bookIndex, 1));
+          }};
+        closeBtn.onclick = doSaveAndClose; saveBtn.onclick = doSaveAndClose;
+        overlay.onclick = e => { if(e.target === overlay) doSaveAndClose(); };
       }
-      
       function enableInlineEdit(element, onSave) {
-        element.onclick = (e) => {
-          e.stopPropagation();
-          if (element.querySelector('input')) return;
+          element.onclick = (e) => {
+          e.stopPropagation(); if (element.querySelector('input')) return;
           const currentText = element.textContent;
           const input = createEl('input', { type: 'text', value: currentText });
-          element.innerHTML = '';
-          element.appendChild(input);
-          input.focus();
-          input.select();
+          element.innerHTML = ''; element.appendChild(input); input.focus(); input.select();
           const save = () => {
             const newText = input.value.trim();
             element.textContent = (newText && newText !== currentText) ? newText : currentText;
             if (newText && newText !== currentText) onSave(newText);
-            input.removeEventListener('blur', save);
-            input.removeEventListener('keydown', handleKeydown);
+            input.removeEventListener('blur', save); input.removeEventListener('keydown', handleKeydown);
           };
           const handleKeydown = (e) => {
             if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
             if (e.key === 'Escape') { input.value = currentText; input.blur(); }
           };
-          input.addEventListener('blur', save);
-          input.addEventListener('keydown', handleKeydown);
+          input.addEventListener('blur', save); input.addEventListener('keydown', handleKeydown);
         };
-      }
-
-      function render() {
-        const searchVal = (globalSearch.value || '').trim().toLowerCase();
-        main.innerHTML = '';
-        renderTabs();
-        
-        main.appendChild(renderBookshelfHeader(state.bookshelves[state.active], state.active));
-        const shelfContainer = createEl('div', { id: 'shelfContainer' });
-        
-        if (searchVal) {
-          renderSearchResults(searchVal, shelfContainer);
-        } else {
-          if (!state.bookshelves.length) { renderEmptyState(); return; }
-          const currentBS = state.bookshelves[state.active] || state.bookshelves[0];
-          if (!currentBS) { renderEmptyState(); return; }
-          (currentBS.shelves || []).forEach((shelf, shelfIndex) => {
-            shelfContainer.appendChild(renderShelf(shelf, state.active, shelfIndex));
-          });
-        }
-        main.appendChild(shelfContainer);
-        initDragAndDrop();
-        setTimeout(layoutShelves, 10);
-      }
-
-      function renderTabs() {
-        tabsStack.innerHTML = '';
-        state.bookshelves.forEach((bs, i) => {
-          const b = createEl('button', { className: 'tab-btn' + (state.active === i ? ' active' : ''), title: bs.name, textContent: bs.name.slice(0, 10) + (bs.name.length > 10 ? '…' : '') });
-          b.onclick = () => modifyState(s => s.active = i);
-          tabsStack.appendChild(b);
-        });
-        const add = createEl('button', { className: 'tab-btn add', textContent: '+', title: 'Add bookshelf' });
-        add.onclick = async () => {
-          const name = await promptText('New Bookshelf', 'Bookshelf name');
-          if (name) modifyState(s => { s.bookshelves.push({ id: newId(), name, shelves: [] }); s.active = s.bookshelves.length - 1; });
-        };
-        tabsStack.appendChild(add);
-      }
-
-      function renderEmptyState() {
-        const empty = createEl('div', { className: 'bs-header' });
-        empty.innerHTML = `<div class="bs-title">No bookshelves yet</div>`;
-        const btn = createEl('button', { className: 'btn-header', textContent: 'Create your first bookshelf' });
-        btn.onclick = async () => {
-          const name = await promptText('New Bookshelf', 'Bookshelf name');
-          if (name) modifyState(s => { s.bookshelves.push({ id: newId(), name, shelves: [] }); s.active = 0; });
-        };
-        empty.appendChild(btn);
-        main.innerHTML = ''; // Clear main before adding empty state
-        main.appendChild(empty);
-      }
-
-      function renderBookshelfHeader(bs, bsIndex) {
-        if (!bs) return createEl('div'); // Return empty div if no bookshelf
-        const header = createEl('div', { className: 'bs-header' });
-        const title = createEl('div', { className: 'bs-title', textContent: bs.name });
-        enableInlineEdit(title, (newName) => modifyState(s => s.bookshelves[bsIndex].name = newName));
-        const controls = createEl('div', { className: 'bs-controls' });
-        const addShelfBtn = createEl('button', { className: 'btn-header', textContent: '+ Shelf' });
-        addShelfBtn.onclick = async () => {
-          const name = await promptText('New Shelf', 'Shelf name');
-          if (name) modifyState(s => { s.bookshelves[bsIndex].shelves.push({ id: newId(), name, collapsed: false, books: [], addGradient: crossBasketGradient() }); });
-        };
-        const deleteBSBtn = createEl('button', { className: 'btn-header', textContent: 'Delete Bookshelf' });
-        deleteBSBtn.onclick = async () => {
-          if (await confirmAction(`Delete bookshelf "${bs.name}"?`)) {
-            modifyState(s => { s.bookshelves.splice(bsIndex, 1); s.active = Math.max(0, s.active - 1); });
-          }
-        };
-        controls.append(addShelfBtn, deleteBSBtn);
-        header.append(title, controls);
-        return header;
-      }
-
-      function renderShelf(shelf, bsIndex, shelfIndex) {
-        const wrap = createEl('div', { className: 'shelf-wrap', 'data-shelf-id': shelf.id });
-        const bar = createEl('div', { className: 'shelf-bar' });
-        const name = createEl('div', { className: 'shelf-name', textContent: shelf.name });
-        enableInlineEdit(name, (newName) => modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].name = newName));
-        if (shelfIndex < 10) {
-          const shortcut = createEl('div', { className: 'shelf-shortcut', textContent: shelfIndex === 9 ? '0' : (shelfIndex + 1).toString() });
-          bar.appendChild(shortcut);
-        }
-        const ctrls = createEl('div', { className: 'shelf-controls' });
-        const [addG1, addG2] = shelf.addGradient || (shelf.addGradient = crossBasketGradient());
-        const addB = createEl('button', { className: 'add-book-btn', textContent: '+' });
-        addB.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
-        addB.onclick = async () => {
-          const title = await promptText('New Book', 'Book title');
-          if (title) modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.push({ id: newId(), title, content: '', gradient: crossBasketGradient(), tags: [] }));
-        };
-        const delShelf = createEl('button', { className: 'btn-shelf delete-btn', textContent: 'X' });
-        delShelf.onclick = async () => {
-          if (await confirmAction(`Delete shelf "${shelf.name}"?`)) {
-            modifyState(s => s.bookshelves[bsIndex].shelves.splice(shelfIndex, 1));
-          }
-        };
-        const coll = createEl('button', { className: 'btn-shelf', textContent: shelf.collapsed ? '▶' : '▼' });
-        coll.onclick = () => {
-          modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].collapsed = !s.bookshelves[bsIndex].shelves[shelfIndex].collapsed, false);
-          render(); // Full re-render to re-calculate layout
-        };
-        ctrls.append(addB, delShelf, coll);
-        bar.append(name, ctrls);
-        wrap.appendChild(bar);
-        if (!shelf.collapsed) {
-          const body = createEl('div', { className: 'shelf-body', 'data-shelf-id': shelf.id });
-          (shelf.books || []).forEach((book, bookIndex) => body.appendChild(renderBook(book, bsIndex, shelfIndex, bookIndex)));
-          const addTile = createEl('div', { className: 'book-add', textContent: '+' });
-          addTile.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
-          addTile.onclick = addB.onclick;
-          body.appendChild(addTile);
-          wrap.appendChild(body);
-        }
-        return wrap;
-      }
-
-      function renderBook(book, bsIndex, shelfIndex, bookIndex) {
-        const [a, b] = book.gradient || (book.gradient = crossBasketGradient());
-        const el = createEl('div', { className: 'book', textContent: book.title, draggable: true, 'data-book-id': book.id });
-        el.style.background = `linear-gradient(135deg, ${a}, ${b})`;
-        el.onclick = () => editBook(book, bsIndex, shelfIndex, bookIndex);
-        return el;
-      }
-
-      function renderSearchResults(query, container) {
-          const tagMatches = [], otherMatches = [], matchedBookIds = new Set();
-          state.bookshelves.forEach((bs, bi) => (bs.shelves || []).forEach((sh, si) => (sh.books || []).forEach((bk, ki) => {
-              if ((bk.tags || []).some(tag => tag.toLowerCase().includes(query))) {
-                  tagMatches.push({ bi, si, ki, bs, sh, bk });
-                  matchedBookIds.add(bk.id);
-              }
-          })));
-          state.bookshelves.forEach((bs, bi) => (bs.shelves || []).forEach((sh, si) => (sh.books || []).forEach((bk, ki) => {
-              if (matchedBookIds.has(bk.id)) return;
-              if ((bk.title || '').toLowerCase().includes(query) || (bk.content || '').toLowerCase().includes(query)) {
-                  otherMatches.push({ bi, si, ki, bs, sh, bk });
-              }
-          })));
-          const results = [...tagMatches, ...otherMatches];
-          main.querySelector('.bs-header .bs-title').textContent = `Search results for “${safe(query)}” — ${results.length} found`;
-          
-          const body = createEl('div', { className: 'shelf-body' });
-          results.forEach(({ bk, bi, si, ki, bs, sh }) => {
-              const card = renderBook(bk, bi, si, ki);
-              card.title = `${bs.name} › ${sh.name} › ${bk.title}`;
-              body.appendChild(card);
-          });
-          container.appendChild(body);
-      }
-
-      function saveToFile() {
-        const data = JSON.stringify(state, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = createEl('a', { href: url, download: 'aethernote_backup.json' });
-        a.click(); URL.revokeObjectURL(url);
-      }
-
-      function loadFromFile() {
-        const input = createEl('input', { type: 'file', accept: '.json' });
-        input.onchange = e => {
-          const file = e.target.files[0]; if (!file) return;
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            try {
-              const newState = JSON.parse(event.target.result);
-              if (newState && Array.isArray(newState.bookshelves)) {
-                normalizeState(newState);
-                if (await confirmAction('This will overwrite current notes. Are you sure?')) {
-                  modifyState(s => { Object.assign(s, newState); });
-                  applyTheme(getThemeByName(state.activeTheme));
-                }
-              } else { alert('Invalid file format.'); }
-            } catch (err) { alert('Could not read file.'); console.error(err); }
-          };
-          reader.readAsText(file);
-        };
-        input.click();
-      }
-
-      async function updateApp() {
-        if (!('serviceWorker' in navigator)) { alert('Service workers are not supported.'); return; }
-        try {
-          const registration = await navigator.serviceWorker.getRegistration();
-          if (registration) await registration.unregister();
-          const keys = await caches.keys();
-          await Promise.all(keys.map(key => caches.delete(key)));
-          window.location.reload();
-        } catch (error) { console.error('Error during app update:', error); alert('Failed to update app.'); }
       }
 
       const SYSTEM_THEMES = [
-        { name: 'Cyber Glow', isSystem: true, colors: { '--bg-1': '#0d0221', '--bg-2': '#24174d', '--accent': '#00d5ff', '--ink': '#f0f0f0', '--ink-dim': '#a0a0a0', '--panel-10': 'rgba(255,255,255,0.10)', '--panel-16': 'rgba(255,255,255,0.16)', '--panel-24': 'rgba(255,255,255,0.24)' } },
-        { name: 'Solarized Light', isSystem: true, colors: { '--bg-1': '#fdf6e3', '--bg-2': '#eee8d5', '--accent': '#268bd2', '--ink': '#586e75', '--ink-dim': '#93a1a1', '--panel-10': 'rgba(0,0,0,0.04)', '--panel-16': 'rgba(0,0,0,0.06)', '--panel-24': 'rgba(0,0,0,0.08)' } },
-        { name: 'Crimson Night', isSystem: true, colors: { '--bg-1': '#1a1a1d', '--bg-2': '#2a2a2e', '--accent': '#e50914', '--ink': '#f5f5f1', '--ink-dim': '#999', '--panel-10': 'rgba(255,255,255,0.05)', '--panel-16': 'rgba(255,255,255,0.08)', '--panel-24': 'rgba(255,255,255,0.12)' } },
-        { name: 'Forest Depths', isSystem: true, colors: { '--bg-1': '#1e3c42', '--bg-2': '#2a524f', '--accent': '#a2c523', '--ink': '#e0e0e0', '--ink-dim': '#a0a0a0', '--panel-10': 'rgba(0,0,0,0.1)', '--panel-16': 'rgba(0,0,0,0.15)', '--panel-24': 'rgba(0,0,0,0.2)' } },
-        { name: 'Royal Gold', isSystem: true, colors: { '--bg-1': '#2c2a4d', '--bg-2': '#4f4c7a', '--accent': '#ffd700', '--ink': '#f0e6d2', '--ink-dim': '#bdae93', '--panel-10': 'rgba(255,255,255,0.08)', '--panel-16': 'rgba(255,255,255,0.12)', '--panel-24': 'rgba(255,255,255,0.18)' } },
-        { name: 'Monochrome', isSystem: true, colors: { '--bg-1': '#f5f5f5', '--bg-2': '#e0e0e0', '--accent': '#333', '--ink': '#111', '--ink-dim': '#666', '--panel-10': 'rgba(0,0,0,0.05)', '--panel-16': 'rgba(0,0,0,0.08)', '--panel-24': 'rgba(0,0,0,0.1)' } }
+        { name: 'Cyber Glow', isSystem: true, styles: {
+            colors: { '--bg-1': '#0d0221', '--bg-2': '#24174d', '--accent': '#00d5ff', '--ink': '#f0f0f0', '--ink-dim':'#a0a0a0', '--panel-10': 'rgba(255,255,255,0.08)', '--panel-16': 'rgba(255,255,255,0.12)', '--panel-24': 'rgba(255,255,255,0.20)' },
+            dimensions: { '--r-sm': '10px', '--r-md': '12px', '--border-thickness': '1px' },
+            shadows: { '--shadow-1': '0 8px 30px rgba(0,0,0,0.4)', '--shadow-inset': 'inset 0 0 0 1px rgba(255,255,255,0.1)' }
+        }},
+        { name: 'Soft Material', isSystem: true, styles: {
+            colors: { '--bg-1': '#F4F6F8', '--bg-2': '#FFFFFF', '--accent': '#3498DB', '--ink': '#2C3E50', '--ink-dim': '#7F8C8D', '--panel-10': 'rgba(44, 62, 80, 0.05)', '--panel-16': 'rgba(44, 62, 80, 0.1)', '--panel-24': 'rgba(44, 62, 80, 0.15)'},
+            dimensions: { '--r-sm': '8px', '--r-md': '16px', '--border-thickness': '1px' },
+            shadows: { '--shadow-1': '0 4px 12px rgba(0,0,0,0.1)', '--shadow-inset': 'inset 0 1px 2px rgba(0,0,0,0.05)' }
+        }},
       ];
-      function loadUserThemes() { const raw = localStorage.getItem(THEMES_KEY); if (raw) userThemes = JSON.parse(raw); }
-      function saveUserThemes() { localStorage.setItem(THEMES_KEY, JSON.stringify(userThemes)); }
-      function getAllThemes() { return [...SYSTEM_THEMES, ...userThemes]; }
-      function getThemeByName(name) { return getAllThemes().find(t => t.name === name); }
-      function applyTheme(theme, themeListContainer = null) {
-        if (!theme) return;
-        Object.entries(theme.colors).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
-        modifyState(s => s.activeTheme = theme.name, false);
-        if(themeListContainer) {
-            themeListContainer.querySelector('.theme-card.active')?.classList.remove('active');
-            Array.from(themeListContainer.querySelectorAll('.theme-card')).find(c => c.querySelector('h4').textContent === theme.name)?.classList.add('active');
+      const ICONS = {
+        default: {
+          menu: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
+          save: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>`,
+          load: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+          themes: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+          tags: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586a2 2 0 0 0-2.828 0L2.172 10.172a2 2 0 0 0 0 2.828l9.192 9.192a2 2 0 0 0 2.828 0l7.586-7.586a2 2 0 0 0 0-2.828z"/><circle cx="8.5" cy="8.5" r="1.5"/></svg>`,
+          update: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>`,
+          plus: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+          trash: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+          rename: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`,
+          check: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+          chevronDown: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`,
+          chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`,
         }
+      };
+      
+      function cleanSvg(svgString) {
+        return svgString.replace(/<style.*?<\/style>/g, '')
+                        .replace(/<defs>.*?<\/defs>/g, '')
+                        .replace(/class="[^"]*"/g, '')
+                        .replace(/\s+/g, ' ')
+                        .trim();
       }
+      
+      function getIconsForTheme(theme) {
+        const themeIcons = (theme && theme.styles && theme.styles.icons) || {};
+        // Merge theme icons with defaults, cleaning SVGs in the process
+        const mergedIcons = {...ICONS.default};
+        Object.keys(themeIcons).forEach(key => {
+          if (themeIcons[key]) {
+            mergedIcons[key] = cleanSvg(themeIcons[key]);
+          }
+        });
+        return mergedIcons;
+      }
+      
+      function applyTheme(theme) {
+        if (!theme || !theme.styles) return;
+        for (const category in theme.styles) {
+          if (category !== 'icons') {
+            for (const key in theme.styles[category]) {
+              document.documentElement.style.setProperty(key, theme.styles[category][key]);
+            }
+          }
+        }
+        modifyState(s => s.activeTheme = theme.name, false);
+        render();
+      }
+      
+      function loadUserThemes() { 
+        const raw = localStorage.getItem(THEMES_KEY); 
+        if(raw) userThemes = JSON.parse(raw); 
+      }
+      
+      function saveUserThemes() { 
+        localStorage.setItem(THEMES_KEY, JSON.stringify(userThemes)); 
+      }
+      
+      async function loadSystemThemes() {
+        try {
+          const response = await fetch('./themes.json');
+          if (response.ok) {
+            const themesData = await response.json();
+            
+            if (Array.isArray(themesData)) {
+              return themesData.map(theme => ({ ...theme, isSystem: true }));
+            } else if (themesData.themes && Array.isArray(themesData.themes)) {
+              return themesData.themes.map(theme => ({ ...theme, isSystem: true }));
+            }
+            
+            console.error('Invalid themes.json format');
+            return [];
+          }
+        } catch (error) {
+          console.error('Failed to load themes.json', error);
+        }
+        return [];
+      }
+      
+      function getAllThemes() { 
+        return [...SYSTEM_THEMES, ...systemThemes, ...userThemes]; 
+      }
+      
+      function getThemeByName(name) { 
+        return getAllThemes().find(t => t.name === name) || SYSTEM_THEMES[0]; 
+      }
+      
       function showThemesModal() {
-        const modal = createEl('div', { className: 'modal', innerHTML: `<h3>Themes</h3>` });
+        const modal = createEl('div', { className: 'modal' });
+        modal.innerHTML = `<h3>Themes</h3>`;
         const themeList = createEl('div', { className: 'theme-list' });
-        const renderThemeList = (container) => {
-            container.innerHTML = '';
+        
+        const renderThemeList = () => {
+            themeList.innerHTML = '';
             getAllThemes().forEach(theme => {
                 const card = createEl('div', { className: 'theme-card' + (state.activeTheme === theme.name ? ' active' : '') });
-                card.onclick = () => applyTheme(theme, container);
+                card.onclick = () => { 
+                  applyTheme(theme);
+                  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+                  card.classList.add('active');
+                };
                 card.innerHTML = `<h4>${safe(theme.name)}</h4>`;
                 const swatches = createEl('div', { className: 'theme-swatches' });
                 ['--bg-1', '--bg-2', '--accent', '--ink'].forEach(key => {
                     const swatch = createEl('div', { className: 'swatch' });
-                    swatch.style.backgroundColor = theme.colors[key];
+                    swatch.style.backgroundColor = theme.styles.colors[key];
                     swatches.appendChild(swatch);
                 });
                 card.append(swatches);
                 if (!theme.isSystem) {
-                    const deleteBtn = createEl('button', { className: 'delete-theme-btn', textContent: '×' });
+                    const deleteBtn = createEl('button', { className: 'delete-theme-btn', innerHTML: '&times;' });
                     deleteBtn.onclick = async (e) => {
                         e.stopPropagation();
                         if (await confirmAction(`Delete theme "${theme.name}"?`)) {
                             userThemes = userThemes.filter(t => t.name !== theme.name);
-                            saveUserThemes(); renderThemeList(container);
+                            saveUserThemes();
+                            renderThemeList();
                         }
                     };
                     card.appendChild(deleteBtn);
                 }
-                container.appendChild(card);
+                themeList.appendChild(card);
             });
         };
-        renderThemeList(themeList);
+        
+        renderThemeList();
         const actions = createEl('div', { className: 'actions' });
         const rightActions = createEl('div', { className: 'right-actions' });
         const loadBtn = createEl('button', { className: 'btn', textContent: 'Load Theme' });
@@ -964,120 +684,453 @@
                 reader.onload = async (event) => {
                     try {
                         const newTheme = JSON.parse(event.target.result);
-                        if (newTheme.name && newTheme.colors && !getThemeByName(newTheme.name)) {
-                            userThemes.push(newTheme); saveUserThemes(); renderThemeList(themeList);
-                        } else { alert('Invalid theme file or name already exists.'); }
-                    } catch (err) { alert('Could not read theme file.'); }
+                        if (!newTheme.name || !newTheme.styles) { alert('Invalid theme file: Missing "name" or "styles" property.'); return; }
+                        const existingUserThemeIndex = userThemes.findIndex(t => t.name.toLowerCase() === newTheme.name.toLowerCase());
+                        if (existingUserThemeIndex > -1) {
+                            if (await confirmAction(`A custom theme named "${newTheme.name}" already exists. Do you want to overwrite it?`)) {
+                                userThemes[existingUserThemeIndex] = newTheme;
+                            } else { return; }
+                        } else { userThemes.push(newTheme); }
+                        saveUserThemes(); renderThemeList(); applyTheme(newTheme);
+                    } catch (err) { alert(`Could not load theme. Error: ${err.message}`); console.error("Theme load error:", err); }
                 };
                 reader.readAsText(file);
             };
             input.click();
         };
         closeBtn.onclick = hideOverlay;
-        rightActions.append(loadBtn, closeBtn);
-        actions.append(createEl('div'), rightActions);
-        modal.append(themeList, actions);
-        showOverlay(modal);
+        rightActions.append(loadBtn, closeBtn); actions.append(createEl('div'), rightActions);
+        modal.append(themeList, actions); showOverlay(modal);
+      }
+      
+      function render() {
+        const icons = getIconsForTheme(getThemeByName(state.activeTheme));
+        const searchVal = (globalSearch.value || '').trim().toLowerCase();
+        main.innerHTML = ''; renderTabs(icons);
+        const header = renderBookshelfHeader(state.bookshelves[state.active], state.active, icons);
+        main.appendChild(header);
+        const shelfContainer = createEl('div', { id: 'shelfContainer' });
+        if (searchVal) {
+            renderSearchResults(searchVal, shelfContainer, icons);
+        } else {
+            if (!state.bookshelves.length) { renderEmptyState(icons); return; }
+            const currentBS = state.bookshelves[state.active];
+            if (currentBS && currentBS.shelves) {
+                currentBS.shelves.forEach((shelf, shelfIndex) => {
+                    shelfContainer.appendChild(renderShelf(shelf, state.active, shelfIndex, icons));
+                });
+            }
+        }
+        main.appendChild(shelfContainer); initDragAndDrop(); setTimeout(layoutShelves, 50);
+      }
+      
+      function renderTabs(icons) {
+        tabsStack.innerHTML = '';
+        state.bookshelves.forEach((bs, i) => {
+          const b = createEl('button', { className: 'tab-btn' + (state.active === i ? ' active' : ''), title: bs.name, textContent: bs.name });
+          b.onclick = () => modifyState(s => s.active = i);
+          tabsStack.appendChild(b);
+        });
+        const add = createEl('button', { className: 'tab-btn add', title: 'Add bookshelf', innerHTML: `<span class="icon">${icons.plus}</span>`});
+        add.onclick = async () => {
+          const name = await promptText('New Bookshelf', 'Bookshelf name');
+          if (name) modifyState(s => { s.bookshelves.push({ id: newId(), name, shelves: [] }); s.active = s.bookshelves.length - 1; });
+        };
+        tabsStack.appendChild(add);
+      }
+      
+      function renderEmptyState(icons) {
+        const empty = createEl('div', { className: 'bs-header' });
+        empty.innerHTML = `<div class="bs-title">No bookshelves yet</div>`;
+        const btn = createEl('button', { className: 'btn-header', innerHTML: `<span class="icon">${icons.plus}</span>Create your first bookshelf` });
+        btn.onclick = async () => {
+          const name = await promptText('New Bookshelf', 'Bookshelf name');
+          if (name) modifyState(s => { s.bookshelves.push({ id: newId(), name, shelves: [] }); s.active = 0; });
+        };
+        empty.appendChild(btn); main.innerHTML = ''; main.appendChild(empty);
+      }
+      
+      function renderBookshelfHeader(bs, bsIndex, icons) {
+        if (!bs) { renderEmptyState(icons); return createEl('div'); }
+        const header = createEl('div', { className: 'bs-header' });
+        const title = createEl('div', { className: 'bs-title', textContent: bs.name });
+        enableInlineEdit(title, (newName) => modifyState(s => s.bookshelves[bsIndex].name = newName));
+        const controls = createEl('div', { className: 'bs-controls' });
+        const addShelfBtn = createEl('button', { className: 'btn-header', innerHTML: `<span class="icon">${icons.plus}</span>Shelf` });
+        addShelfBtn.onclick = async () => {
+          const name = await promptText('New Shelf', 'Shelf name');
+          if (name) modifyState(s => { s.bookshelves[bsIndex].shelves.push({ id: newId(), name, collapsed: false, books: []}); });
+        };
+        const deleteBSBtn = createEl('button', { className: 'btn-header', innerHTML: `<span class="icon">${icons.trash}</span>Delete Bookshelf` });
+        deleteBSBtn.onclick = async () => {
+          if (await confirmAction(`Delete bookshelf "${bs.name}"?`)) {
+            modifyState(s => { s.bookshelves.splice(bsIndex, 1); s.active = Math.max(0, s.active - 1); });
+          }
+        };
+        controls.append(addShelfBtn, deleteBSBtn); header.append(title, controls); return header;
+      }
+      
+      function renderShelf(shelf, bsIndex, shelfIndex, icons) {
+        const wrap = createEl('div', { className: 'shelf-wrap', 'data-shelf-id': shelf.id });
+        const bar = createEl('div', { className: 'shelf-bar' });
+        const name = createEl('div', { className: 'shelf-name', textContent: shelf.name });
+        enableInlineEdit(name, (newName) => modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].name = newName));
+        if (shelfIndex < 10) {
+          const shortcut = createEl('div', { className: 'shelf-shortcut', textContent: shelfIndex === 9 ? '0' : (shelfIndex + 1).toString() });
+          bar.appendChild(shortcut);
+        }
+        const ctrls = createEl('div', { className: 'shelf-controls' });
+        const [addG1, addG2] = shelf.addGradient || (shelf.addGradient = crossBasketGradient());
+        const addB = createEl('button', { className: 'add-book-btn', innerHTML: `<span class="icon">${icons.plus}</span>` });
+        addB.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
+        addB.onclick = async () => {
+          const title = await promptText('New Book', 'Book title');
+          if (title) { modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].books.push({ id: newId(), title, content: '', tags: [], gradient: crossBasketGradient() })); }
+        };
+        const delShelf = createEl('button', { className: 'btn-shelf delete-btn', innerHTML: `<span class="icon">${icons.trash}</span>` });
+        delShelf.onclick = async () => {
+          if (await confirmAction(`Delete shelf "${shelf.name}"?`)) {
+            modifyState(s => s.bookshelves[bsIndex].shelves.splice(shelfIndex, 1));
+          }
+        };
+        const collIcon = shelf.collapsed ? icons.chevronRight : icons.chevronDown;
+        const coll = createEl('button', { className: 'btn-shelf', innerHTML: `<span class="icon">${collIcon}</span>` });
+        coll.onclick = () => {
+          modifyState(s => s.bookshelves[bsIndex].shelves[shelfIndex].collapsed = !s.bookshelves[bsIndex].shelves[shelfIndex].collapsed, false);
+          render();
+        };
+        ctrls.append(addB, delShelf, coll); bar.append(name, ctrls); wrap.appendChild(bar);
+        if (!shelf.collapsed) {
+          const body = createEl('div', { className: 'shelf-body', 'data-shelf-id': shelf.id });
+          (shelf.books || []).forEach((book, bookIndex) => body.appendChild(renderBook(book, bsIndex, shelfIndex, bookIndex, icons)));
+          const addTile = createEl('div', { className: 'book-add', innerHTML: `<span class="icon">${icons.plus}</span>` });
+          addTile.style.background = `linear-gradient(135deg, ${addG1}, ${addG2})`;
+          addTile.onclick = addB.onclick;
+          body.appendChild(addTile);
+          wrap.appendChild(body);
+        }
+        return wrap;
+      }
+      
+      function renderBook(book, bsIndex, shelfIndex, bookIndex, icons) {
+        const [a, b] = book.gradient || crossBasketGradient();
+        const el = createEl('div', { className: 'book', textContent: book.title, draggable: true, 'data-book-id': book.id });
+        el.style.background = `linear-gradient(135deg, ${a}, ${b})`;
+        el.onclick = () => editBook(book, bsIndex, shelfIndex, bookIndex);
+        return el;
+      }
+      
+      function renderSearchResults(query, container, icons) {
+          const tagMatches = [], otherMatches = [], matchedBookIds = new Set();
+          state.bookshelves.forEach((bs, bi) => (bs.shelves || []).forEach((sh, si) => (sh.books || []).forEach((bk, ki) => {
+              if ((bk.tags || []).some(tag => tag.toLowerCase().includes(query))) { tagMatches.push({ bi, si, ki, bs, sh, bk }); matchedBookIds.add(bk.id); }
+          })));
+          state.bookshelves.forEach((bs, bi) => (bs.shelves || []).forEach((sh, si) => (sh.books || []).forEach((bk, ki) => {
+              if (matchedBookIds.has(bk.id)) return;
+              if ((bk.title || '').toLowerCase().includes(query) || (bk.content || '').toLowerCase().includes(query)) { otherMatches.push({ bi, si, ki, bs, sh, bk }); }
+          })));
+          const results = [...tagMatches, ...otherMatches];
+          main.querySelector('.bs-header .bs-title').textContent = `Search results for “${safe(query)}” — ${results.length} found`;
+          const body = createEl('div', { className: 'shelf-body', style: 'display: flex; flex-wrap: wrap; gap: 16px;' });
+          results.forEach(({ bk, bi, si, ki, bs, sh }) => {
+              const card = renderBook(bk, bi, si, ki, icons);
+              card.title = `${bs.name} › ${sh.name} › ${bk.title}`;
+              card.style.width = 'calc(33.333% - 11px)';
+              body.appendChild(card);
+          });
+          container.appendChild(body);
       }
       
       function showTagsModal() {
-        const modal = createEl('div', { className: 'modal', innerHTML: `<h3>All Tags</h3>` });
-        const tagsList = createEl('div', { className: 'global-tags-list' });
+        const modal = createEl('div', { className: 'modal' });
+        modal.innerHTML = `<h3>All Tags</h3>`;
+        
+        // Collect all tags from all books
         const allTags = new Set();
-        state.bookshelves.forEach(bs => bs.shelves.forEach(sh => sh.books.forEach(bk => (bk.tags || []).forEach(tag => allTags.add(tag)))));
-        const sortedTags = Array.from(allTags).sort((a, b) => a.localeCompare(b));
-        if (sortedTags.length === 0) { tagsList.textContent = 'No tags created yet.'; }
-        else { sortedTags.forEach(tag => {
-                const tagBtn = createEl('button', { className: 'btn tag-btn', textContent: tag });
-                tagBtn.onclick = () => { hideOverlay(); globalSearch.value = tag; render(); };
-                tagsList.appendChild(tagBtn);
+        state.bookshelves.forEach(bs => {
+          (bs.shelves || []).forEach(sh => {
+            (sh.books || []).forEach(bk => {
+              (bk.tags || []).forEach(tag => allTags.add(tag));
             });
+          });
+        });
+        
+        const tagsContainer = createEl('div', { className: 'global-tags-list' });
+        
+        if (allTags.size === 0) {
+          tagsContainer.innerHTML = '<p>No tags yet.</p>';
+        } else {
+          allTags.forEach(tag => {
+            const tagBtn = createEl('button', { 
+              className: 'tag-btn', 
+              textContent: `#${tag}`,
+              onclick: () => {
+                globalSearch.value = tag;
+                render();
+                hideOverlay();
+              }
+            });
+            tagsContainer.appendChild(tagBtn);
+          });
         }
+        
         const actions = createEl('div', { className: 'actions' });
-        const rightActions = createEl('div', { className: 'right-actions' });
-        const closeBtn = createEl('button', { className: 'btn ghost', textContent: 'Close' });
+        const closeBtn = createEl('button', { className: 'btn primary', textContent: 'Close' });
         closeBtn.onclick = hideOverlay;
-        rightActions.append(closeBtn);
-        actions.append(createEl('div'), rightActions);
-        modal.append(tagsList, actions);
+        actions.appendChild(closeBtn);
+        
+        modal.appendChild(tagsContainer);
+        modal.appendChild(actions);
         showOverlay(modal);
       }
-
-      let draggedBookId = null, sourceShelfId = null;
+      
       function initDragAndDrop() {
-          document.querySelectorAll('.book').forEach(b => { b.addEventListener('dragstart', e => {
-              draggedBookId = e.target.dataset.bookId;
-              sourceShelfId = e.target.closest('.shelf-body').dataset.shelfId;
-              e.dataTransfer.effectAllowed = 'move';
-              setTimeout(() => e.target.classList.add('dragging'), 0);
-          }); b.addEventListener('dragend', e => e.target.classList.remove('dragging')); });
-          document.querySelectorAll('.shelf-body').forEach(sb => {
-              sb.addEventListener('dragover', e => { e.preventDefault(); e.currentTarget.classList.add('drag-over'); });
-              sb.addEventListener('dragleave', e => e.currentTarget.classList.remove('drag-over'));
-              sb.addEventListener('drop', e => {
-                  e.preventDefault(); e.currentTarget.classList.remove('drag-over');
-                  const targetShelfId = e.currentTarget.dataset.shelfId;
-                  if (draggedBookId && sourceShelfId && targetShelfId) moveBook(draggedBookId, sourceShelfId, targetShelfId);
+        const books = document.querySelectorAll('.book');
+        const shelves = document.querySelectorAll('.shelf-body');
+        
+        books.forEach(book => {
+          book.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', book.dataset.bookId);
+            book.classList.add('dragging');
+          });
+          
+          book.addEventListener('dragend', () => {
+            book.classList.remove('dragging');
+          });
+        });
+        
+        shelves.forEach(shelf => {
+          shelf.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            shelf.classList.add('drag-over');
+          });
+          
+          shelf.addEventListener('dragleave', () => {
+            shelf.classList.remove('drag-over');
+          });
+          
+          shelf.addEventListener('drop', (e) => {
+            e.preventDefault();
+            shelf.classList.remove('drag-over');
+            
+            const bookId = e.dataTransfer.getData('text/plain');
+            const toShelfId = shelf.dataset.shelfId;
+            
+            // Find which shelf we're dragging from
+            let fromShelfId = null;
+            let bookData = null;
+            
+            state.bookshelves.forEach(bs => {
+              (bs.shelves || []).forEach(sh => {
+                (sh.books || []).forEach(bk => {
+                  if (bk.id === bookId) {
+                    fromShelfId = sh.id;
+                    bookData = bk;
+                  }
+                });
               });
+            });
+            
+            if (fromShelfId && toShelfId && fromShelfId !== toShelfId && bookData) {
+              moveBook(bookId, fromShelfId, toShelfId);
+            }
           });
+        });
       }
+      
       function moveBook(bookId, fromShelfId, toShelfId) {
-          modifyState(s => {
-              const bs = s.bookshelves[s.active];
-              let bookToMove = null, fromShelf = bs.shelves.find(sh => sh.id === fromShelfId);
-              if (!fromShelf) return;
-              const bookIndex = fromShelf.books.findIndex(b => b.id === bookId);
-              if (bookIndex > -1) bookToMove = fromShelf.books.splice(bookIndex, 1)[0];
-              if (bookToMove) {
-                  const toShelf = bs.shelves.find(sh => sh.id === toShelfId);
-                  if (toShelf) toShelf.books.push(bookToMove);
-                  else fromShelf.books.splice(bookIndex, 0, bookToMove);
+        modifyState(s => {
+          // Find the book and remove it from the source shelf
+          let bookToMove = null;
+          
+          s.bookshelves.forEach(bs => {
+            (bs.shelves || []).forEach(sh => {
+              if (sh.id === fromShelfId) {
+                const bookIndex = sh.books.findIndex(bk => bk.id === bookId);
+                if (bookIndex !== -1) {
+                  bookToMove = sh.books[bookIndex];
+                  sh.books.splice(bookIndex, 1);
+                }
               }
+            });
           });
+          
+          // Add the book to the target shelf
+          if (bookToMove) {
+            s.bookshelves.forEach(bs => {
+              (bs.shelves || []).forEach(sh => {
+                if (sh.id === toShelfId) {
+                  sh.books.push(bookToMove);
+                }
+              });
+            });
+          }
+        });
       }
-
+      
       function createBookInShelf(shelfIndex) {
         const currentBS = state.bookshelves[state.active];
-        if (currentBS && currentBS.shelves.length > shelfIndex) {
-          promptText('New Book', 'Book title').then(title => {
-            if (title) modifyState(s => s.bookshelves[state.active].shelves[shelfIndex].books.push({ id: newId(), title, content: '', gradient: crossBasketGradient(), tags: [] }));
-          });
+        if (!currentBS || !currentBS.shelves || !currentBS.shelves[shelfIndex]) return;
+        
+        promptText('New Book', 'Book title').then(title => {
+          if (title) {
+            modifyState(s => {
+              s.bookshelves[state.active].shelves[shelfIndex].books.push({
+                id: newId(),
+                title,
+                content: '',
+                tags: [],
+                gradient: crossBasketGradient()
+              });
+            });
+          }
+        });
+      }
+      
+      function saveToFile() {
+        const dataStr = JSON.stringify(state, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = 'aethernote-backup.json';
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+      }
+      
+      function loadFromFile() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.onchange = e => {
+          const file = e.target.files[0];
+          const reader = new FileReader();
+          
+          reader.onload = event => {
+            try {
+              const newState = JSON.parse(event.target.result);
+              
+              // Validate structure
+              if (!newState.bookshelves || !Array.isArray(newState.bookshelves)) {
+                throw new Error('Invalid data structure: missing bookshelves array');
+              }
+              
+              // Validate individual bookshelf structure
+              newState.bookshelves.forEach(bs => {
+                if (!bs.name || !bs.id) {
+                  throw new Error('Invalid bookshelf structure');
+                }
+                if (bs.shelves && !Array.isArray(bs.shelves)) {
+                  throw new Error('Invalid shelves structure');
+                }
+              });
+              
+              normalizeState(newState);
+              modifyState(s => {
+                s.bookshelves = newState.bookshelves;
+                s.active = newState.active || 0;
+                if (newState.activeTheme) s.activeTheme = newState.activeTheme;
+              });
+            } catch (err) {
+              alert('Could not load file. It might be corrupted or in the wrong format.');
+              console.error('Load error:', err);
+            }
+          };
+          
+          reader.readAsText(file);
+        };
+        
+        input.click();
+      }
+      
+      async function updateApp() {
+        try {
+          // Clear all caches
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(key => caches.delete(key)));
+          
+          // Update service worker
+          if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+              await registration.unregister();
+            }
+            
+            // Re-register service worker
+            await navigator.serviceWorker.register('./sw.js');
+          }
+          
+          // Clear all stored data except user themes
+          const savedThemes = localStorage.getItem(THEMES_KEY);
+          localStorage.clear();
+          if (savedThemes) {
+            localStorage.setItem(THEMES_KEY, savedThemes);
+          }
+          
+          // Reload the page
+          window.location.reload();
+        } catch (error) {
+          console.error('Update failed:', error);
+          window.location.reload(); // Fallback to simple reload
         }
       }
 
-      document.getElementById('menuBtn').onclick = function(e) { e.stopPropagation(); document.getElementById('menuDropdown').classList.toggle('show'); };
-      window.onclick = () => document.getElementById('menuDropdown').classList.remove('show');
-      globalSearch.addEventListener('input', () => render());
-      document.getElementById('saveBtn').onclick = saveToFile;
-      document.getElementById('loadBtn').onclick = loadFromFile;
-      document.getElementById('updateBtn').onclick = updateApp;
-      document.getElementById('themesBtn').onclick = showThemesModal;
-      document.getElementById('tagsBtn').onclick = showTagsModal;
-
-      window.addEventListener('keydown', e => {
-          if (isModalOpen || e.target.matches('input, textarea') || globalSearch.value) return;
-          const key = e.key.toLowerCase();
-          if (key === 'n') {
-            e.preventDefault();
-            const addShelfBtn = main.querySelector('.bs-controls .btn-header:first-child');
-            if (addShelfBtn) addShelfBtn.click();
-          } else if (key >= '1' && key <= '9') {
-            e.preventDefault();
-            createBookInShelf(parseInt(key) - 1);
-          } else if (key === '0') {
-            e.preventDefault();
-            createBookInShelf(9);
-          } else if (key === 'escape' && isModalOpen) {
-            hideOverlay();
+      async function initApp() {
+        loadFromStorage(); 
+        loadUserThemes();
+        
+        // Load system themes from the single themes.json file
+        systemThemes = await loadSystemThemes();
+        
+        applyTheme(getThemeByName(state.activeTheme));
+        const icons = getIconsForTheme(getThemeByName(state.activeTheme));
+        document.getElementById('menuBtn').innerHTML = `<span class="icon">${icons.menu}</span>`;
+        document.getElementById('saveBtn').innerHTML = `<span class="icon">${icons.save}</span> Save`;
+        document.getElementById('loadBtn').innerHTML = `<span class="icon">${icons.load}</span> Load`;
+        document.getElementById('themesBtn').innerHTML = `<span class="icon">${icons.themes}</span> Themes`;
+        document.getElementById('tagsBtn').innerHTML = `<span class="icon">${icons.tags}</span> Tags`;
+        document.getElementById('updateBtn').innerHTML = `<span class="icon">${icons.update}</span> Update`;
+        document.getElementById('menuBtn').onclick = function(e) { e.stopPropagation(); document.getElementById('menuDropdown').classList.toggle('show'); };
+        window.onclick = () => document.getElementById('menuDropdown').classList.remove('show');
+        globalSearch.addEventListener('input', () => render());
+        document.getElementById('saveBtn').onclick = saveToFile;
+        document.getElementById('loadBtn').onclick = loadFromFile;
+        document.getElementById('updateBtn').onclick = updateApp;
+        document.getElementById('themesBtn').onclick = showThemesModal;
+        document.getElementById('tagsBtn').onclick = showTagsModal;
+        
+        // Escape key handler
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape') {
+            if (isModalOpen) {
+              // Try to find a close/cancel button in the modal
+              const modal = document.querySelector('.overlay.show');
+              if (modal) {
+                const closeButton = modal.querySelector('#cancelBtn, .btn.ghost, [title="Close"]');
+                if (closeButton) {
+                  closeButton.click();
+                } else {
+                  // If no specific close button, just hide the overlay
+                  hideOverlay();
+                }
+              }
+            }
           }
-      });
-
-      loadFromStorage();
-      loadUserThemes();
-      applyTheme(getThemeByName(state.activeTheme));
-      render();
+        });
+        
+        window.addEventListener('keydown', e => {
+            if (isModalOpen || e.target.matches('input, textarea') || globalSearch.value) return;
+            const key = e.key.toLowerCase();
+            if (key === 'n') { e.preventDefault(); main.querySelector('.bs-controls .btn-header')?.click(); } 
+            else if (key >= '1' && key <= '9') { e.preventDefault(); createBookInShelf(parseInt(key) - 1); } 
+            else if (key === '0') { e.preventDefault(); createBookInShelf(9); }
+        });
+        render();
+      }
+      initApp();
     })();
   </script>
 </body>
 </html>
-
