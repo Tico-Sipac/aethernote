@@ -62,14 +62,21 @@
       background-image: var(--noise); opacity:.15;
     }
     .brand{font-weight:800; letter-spacing:0.4px; font-size:20px}
-    .search{ flex:1; display:flex; gap:10px; justify-content:flex-end; }
+    .search{ flex:1; display:flex; gap:10px; justify-content:flex-end; position: relative; }
     .search input{
-      width:min(620px,100%); padding:10px 16px; border-radius:var(--r-sm);
+      width:min(620px,100%); padding:10px 40px 10px 16px; border-radius:var(--r-sm);
       border: var(--border-thickness) solid rgba(255,255,255,0.14);
       background: var(--panel-10); color:var(--ink); outline:none;
       backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     }
     .search input::placeholder { color: var(--ink-dim); opacity: 1; }
+    .clear-search-btn {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      border: none; background: none; color: var(--accent);
+      font-size: 24px; font-weight: 700; cursor: pointer; padding: 0 8px;
+      line-height: 1; opacity: 0.7; transition: opacity 0.2s ease;
+    }
+    .clear-search-btn:hover { opacity: 1; }
     .header-menu { position: relative; display: inline-flex; align-items: center; height: 100%; }
     .btn.icon-only { padding: 0; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
     .dropdown-content {
@@ -155,19 +162,14 @@
     .shelf-body::after{ content:""; position:absolute; inset:0; background-image: var(--noise); opacity:.15; border-radius: inherit; pointer-events:none; }
     .book, .book-add{
       width:100%; border-radius: var(--r-sm); color:#fff; font-weight:700;
-      display:flex; align-items: flex-start;
+      display:flex; align-items: center;
       justify-content:center; text-align:center; cursor:pointer; 
       box-shadow: var(--shadow-1), var(--shadow-inset); transition: transform .2s ease, box-shadow .2s ease;
-      position:relative; padding: 12px 8px 8px 22px; 
+      position:relative; padding: 12px;
       white-space: normal; word-break: break-word; line-height: 1.3;
       font-size: 15px; animation: fadeIn 0.4s ease forwards;
     }
     .book:hover{ transform: translateY(-4px) scale(1.03); box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 12px 2px var(--accent); }
-    .book::before{
-      content:""; position:absolute; left:8px; top:10px; bottom:10px; width:6px;
-      background: rgba(0,0,0,0.2); border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-    }
-    .book-add{ align-items:center; padding:0; }
     .book-add .icon { width: 28px; height: 28px; }
     .shelf-shortcut {
       position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
@@ -224,14 +226,9 @@
     }
     .tag-item .delete-tag { cursor: pointer; font-weight: 900; }
     .theme-list { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-  gap: 10px; 
-  margin-top: 10px; 
-  /* Add these two lines */
-  max-height: 50vh; /* Or a value that you find suitable, like 60vh */
-  overflow-y: auto;
-}
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+      gap: 10px; margin-top: 10px; max-height: 60vh; overflow-y: auto; 
+    }
     .theme-card { padding: 12px; border-radius: var(--r-sm); cursor: pointer; border: 2px solid transparent; transition: border .2s ease; position: relative; }
     .theme-card.active { border-color: var(--accent); }
     .theme-card h4 { margin: 0 0 8px 0; font-size: 14px; }
@@ -244,39 +241,15 @@
     }
     .global-tags-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 50vh; overflow-y: auto; }
     .global-tags-list .tag-btn { background: var(--panel-16); color: var(--ink); border: var(--border-thickness) solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer; }
-    .dragging { opacity: 0.5; }
-    .drag-over { border: 2px dashed var(--accent); background-color: rgba(0, 213, 255, 0.1); }
     
     /* Icon styling fixes */
-    .icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn .icon {
-      width: 16px;
-      height: 16px;
-    }
-    .btn-header .icon {
-      width: 16px;
-      height: 16px;
-    }
-    .btn-shelf .icon {
-      width: 18px;
-      height: 18px;
-    }
-    .add-book-btn .icon {
-      width: 20px;
-      height: 20px;
-    }
-    .book-add .icon {
-      width: 28px;
-      height: 28px;
-    }
-    .tab-btn.add .icon {
-      width: 20px;
-      height: 20px;
-    }
+    .icon { display: flex; align-items: center; justify-content: center; }
+    .btn .icon { width: 16px; height: 16px; }
+    .btn-header .icon { width: 16px; height: 16px; }
+    .btn-shelf .icon { width: 18px; height: 18px; }
+    .add-book-btn .icon { width: 20px; height: 20px; }
+    .book-add .icon { width: 28px; height: 28px; }
+    .tab-btn.add .icon { width: 20px; height: 20px; }
     
     @media (max-width:720px){
       .shelf-tabs{ left:0; right:0; width:auto; top:auto; bottom:0; height:84px; display:block;}
@@ -284,13 +257,14 @@
       .tab-btn{ min-height:56px; min-width:76px; }
       main { padding: 16px; padding-bottom: 110px; }
       .shelf-body{ grid-template-columns: repeat(3, 1fr); }
-      .book, .book-add{ height: 150px; font-size: 14px; padding: 12px 12px 8px 24px; }
+      .book, .book-add{ height: 150px; font-size: 14px; padding: 12px; }
       .shelf-wrap { position: relative !important; width: 100% !important; left: auto !important; top: auto !important; opacity: 1 !important; }
       .overlay { align-items: flex-start; padding-top: 5vh; }
       .modal { max-height: 85vh; }
       .modal textarea { min-height: 40vh; }
       .tags-input-wrapper { flex-direction: column; align-items: flex-start; }
       .tags-input-wrapper input { width: 100%; }
+      .theme-list { grid-template-columns: repeat(2, 1fr); }
     }
     @media (min-width: 721px) {
       .book, .book-add { height: auto; aspect-ratio: 1 / 1.4; }
@@ -301,7 +275,10 @@
   <div id="aurora-bg"></div>
   <header>
     <div class="brand">Aethernote</div>
-    <div class="search"> <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." /> </div>
+    <div class="search">
+      <input id="globalSearch" type="search" placeholder="Search notes (tags, title, content)..." />
+      <button id="clearSearchBtn" class="clear-search-btn" style="display: none;" title="Clear search">&times;</button>
+    </div>
     <div class="header-menu">
       <button id="menuBtn" class="btn icon-only" title="Menu"></button>
       <div id="menuDropdown" class="dropdown-content">
@@ -332,6 +309,7 @@
       let userThemes = [];
       let systemThemes = [];
       let isModalOpen = false;
+      let activeModalCloseHandler = null;
 
       const main = document.getElementById('main');
       const tabsStack = document.getElementById('tabsStack');
@@ -425,16 +403,25 @@
         };
       }
       
-      function showOverlay(content) {
+      function showOverlay(content, closeHandler = null) {
+        activeModalCloseHandler = closeHandler;
         overlay.innerHTML = ''; overlay.appendChild(content); overlay.classList.add('show');
         if (!isModalOpen) { history.pushState({ modal: true }, null); isModalOpen = true; }
       }
       function hideOverlay() {
+        activeModalCloseHandler = null;
         overlay.classList.remove('show'); overlay.innerHTML = '';
         if (isModalOpen) { if (history.state && history.state.modal) history.back(); isModalOpen = false; }
       }
       window.addEventListener('popstate', (event) => {
-        if (isModalOpen) { isModalOpen = false; overlay.classList.remove('show'); overlay.innerHTML = ''; }
+        if (isModalOpen) {
+          if (typeof activeModalCloseHandler === 'function') {
+            activeModalCloseHandler();
+          }
+          isModalOpen = false;
+          overlay.classList.remove('show');
+          overlay.innerHTML = '';
+        }
       });
       function promptText(title, placeholder='Name', initial=''){
         return new Promise(resolve => {
@@ -445,9 +432,9 @@
               <button class="btn ghost" id="cancelBtn">Cancel</button>
               <button class="btn primary" id="okBtn">OK</button>
             </div></div>`;
-          showOverlay(modal);
-          const input = document.getElementById('promptInput'); input.focus(); input.select();
           const close = (value) => { hideOverlay(); resolve(value); };
+          showOverlay(modal, () => close(null));
+          const input = document.getElementById('promptInput'); input.focus(); input.select();
           modal.querySelector('#cancelBtn').onclick = () => close(null);
           modal.querySelector('#okBtn').onclick = () => close(input.value.trim() || null);
           input.onkeydown = e => { if(e.key === 'Enter') { e.preventDefault(); modal.querySelector('#okBtn').click(); }};
@@ -461,8 +448,8 @@
               <button class="btn ghost" id="cancelBtn">Cancel</button>
               <button class="btn danger" id="okBtn">Confirm</button>
             </div></div>`;
-          showOverlay(modal);
           const close = (value) => { hideOverlay(); resolve(value); };
+          showOverlay(modal, () => close(false));
           modal.querySelector('#cancelBtn').onclick = () => close(false);
           modal.querySelector('#okBtn').onclick = () => close(true);
         });
@@ -504,13 +491,16 @@
         const saveBtn   = createEl('button', {className: 'btn primary icon-btn', title: 'Save', innerHTML: `<span class="icon">${icons.check}</span>` });
         leftActions.append(renameBtn, deleteBtn); rightActions.append(closeBtn, saveBtn);
         modal.append(textarea, tagsSection, actions);
-        showOverlay(modal);
-        textarea.focus();
+        
         const doSaveAndClose = () => {
           book.content = textarea.value; addPendingTag();
           modifyState(s => { s.bookshelves[bsIndex].shelves[shelfIndex].books[bookIndex] = book; });
           hideOverlay();
         };
+
+        showOverlay(modal, doSaveAndClose);
+
+        textarea.focus();
         renameBtn.onclick = async () => {
           const newTitle = await promptText('Rename Book', 'New book title', book.title);
           if (newTitle) { book.title = newTitle; modal.querySelector('h3').textContent = newTitle; }
@@ -580,7 +570,6 @@
       
       function getIconsForTheme(theme) {
         const themeIcons = (theme && theme.styles && theme.styles.icons) || {};
-        // Merge theme icons with defaults, cleaning SVGs in the process
         const mergedIcons = {...ICONS.default};
         Object.keys(themeIcons).forEach(key => {
           if (themeIcons[key]) {
@@ -617,13 +606,9 @@
           const response = await fetch('./themes.json');
           if (response.ok) {
             const themesData = await response.json();
-            
-            if (Array.isArray(themesData)) {
-              return themesData.map(theme => ({ ...theme, isSystem: true }));
-            } else if (themesData.themes && Array.isArray(themesData.themes)) {
+            if (themesData.themes && Array.isArray(themesData.themes)) {
               return themesData.themes.map(theme => ({ ...theme, isSystem: true }));
             }
-            
             console.error('Invalid themes.json format');
             return [];
           }
@@ -658,9 +643,11 @@
                 card.innerHTML = `<h4>${safe(theme.name)}</h4>`;
                 const swatches = createEl('div', { className: 'theme-swatches' });
                 ['--bg-1', '--bg-2', '--accent', '--ink'].forEach(key => {
-                    const swatch = createEl('div', { className: 'swatch' });
-                    swatch.style.backgroundColor = theme.styles.colors[key];
-                    swatches.appendChild(swatch);
+                    if(theme.styles.colors[key]) {
+                      const swatch = createEl('div', { className: 'swatch' });
+                      swatch.style.backgroundColor = theme.styles.colors[key];
+                      swatches.appendChild(swatch);
+                    }
                 });
                 card.append(swatches);
                 if (!theme.isSystem) {
@@ -708,7 +695,7 @@
         };
         closeBtn.onclick = hideOverlay;
         rightActions.append(loadBtn, closeBtn); actions.append(createEl('div'), rightActions);
-        modal.append(themeList, actions); showOverlay(modal);
+        modal.append(themeList, actions); showOverlay(modal, hideOverlay);
       }
       
       function render() {
@@ -729,7 +716,8 @@
                 });
             }
         }
-        main.appendChild(shelfContainer); initDragAndDrop(); setTimeout(layoutShelves, 50);
+        main.appendChild(shelfContainer);
+        setTimeout(layoutShelves, 50);
       }
       
       function renderTabs(icons) {
@@ -822,7 +810,7 @@
       
       function renderBook(book, bsIndex, shelfIndex, bookIndex, icons) {
         const [a, b] = book.gradient || crossBasketGradient();
-        const el = createEl('div', { className: 'book', textContent: book.title, draggable: true, 'data-book-id': book.id });
+        const el = createEl('div', { className: 'book', textContent: book.title, 'data-book-id': book.id });
         el.style.background = `linear-gradient(135deg, ${a}, ${b})`;
         el.onclick = () => editBook(book, bsIndex, shelfIndex, bookIndex);
         return el;
@@ -852,8 +840,6 @@
       function showTagsModal() {
         const modal = createEl('div', { className: 'modal' });
         modal.innerHTML = `<h3>All Tags</h3>`;
-        
-        // Collect all tags from all books
         const allTags = new Set();
         state.bookshelves.forEach(bs => {
           (bs.shelves || []).forEach(sh => {
@@ -862,118 +848,23 @@
             });
           });
         });
-        
         const tagsContainer = createEl('div', { className: 'global-tags-list' });
-        
         if (allTags.size === 0) {
           tagsContainer.innerHTML = '<p>No tags yet.</p>';
         } else {
-          allTags.forEach(tag => {
+          Array.from(allTags).sort().forEach(tag => {
             const tagBtn = createEl('button', { 
-              className: 'tag-btn', 
-              textContent: `#${tag}`,
-              onclick: () => {
-                globalSearch.value = tag;
-                render();
-                hideOverlay();
-              }
+              className: 'tag-btn', textContent: `#${tag}`,
+              onclick: () => { globalSearch.value = tag; render(); hideOverlay(); }
             });
             tagsContainer.appendChild(tagBtn);
           });
         }
-        
         const actions = createEl('div', { className: 'actions' });
         const closeBtn = createEl('button', { className: 'btn primary', textContent: 'Close' });
         closeBtn.onclick = hideOverlay;
-        actions.appendChild(closeBtn);
-        
-        modal.appendChild(tagsContainer);
-        modal.appendChild(actions);
-        showOverlay(modal);
-      }
-      
-      function initDragAndDrop() {
-        const books = document.querySelectorAll('.book');
-        const shelves = document.querySelectorAll('.shelf-body');
-        
-        books.forEach(book => {
-          book.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', book.dataset.bookId);
-            book.classList.add('dragging');
-          });
-          
-          book.addEventListener('dragend', () => {
-            book.classList.remove('dragging');
-          });
-        });
-        
-        shelves.forEach(shelf => {
-          shelf.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            shelf.classList.add('drag-over');
-          });
-          
-          shelf.addEventListener('dragleave', () => {
-            shelf.classList.remove('drag-over');
-          });
-          
-          shelf.addEventListener('drop', (e) => {
-            e.preventDefault();
-            shelf.classList.remove('drag-over');
-            
-            const bookId = e.dataTransfer.getData('text/plain');
-            const toShelfId = shelf.dataset.shelfId;
-            
-            // Find which shelf we're dragging from
-            let fromShelfId = null;
-            let bookData = null;
-            
-            state.bookshelves.forEach(bs => {
-              (bs.shelves || []).forEach(sh => {
-                (sh.books || []).forEach(bk => {
-                  if (bk.id === bookId) {
-                    fromShelfId = sh.id;
-                    bookData = bk;
-                  }
-                });
-              });
-            });
-            
-            if (fromShelfId && toShelfId && fromShelfId !== toShelfId && bookData) {
-              moveBook(bookId, fromShelfId, toShelfId);
-            }
-          });
-        });
-      }
-      
-      function moveBook(bookId, fromShelfId, toShelfId) {
-        modifyState(s => {
-          // Find the book and remove it from the source shelf
-          let bookToMove = null;
-          
-          s.bookshelves.forEach(bs => {
-            (bs.shelves || []).forEach(sh => {
-              if (sh.id === fromShelfId) {
-                const bookIndex = sh.books.findIndex(bk => bk.id === bookId);
-                if (bookIndex !== -1) {
-                  bookToMove = sh.books[bookIndex];
-                  sh.books.splice(bookIndex, 1);
-                }
-              }
-            });
-          });
-          
-          // Add the book to the target shelf
-          if (bookToMove) {
-            s.bookshelves.forEach(bs => {
-              (bs.shelves || []).forEach(sh => {
-                if (sh.id === toShelfId) {
-                  sh.books.push(bookToMove);
-                }
-              });
-            });
-          }
-        });
+        actions.appendChild(createEl('div')); actions.appendChild(closeBtn);
+        modal.append(tagsContainer, actions); showOverlay(modal, hideOverlay);
       }
       
       function createBookInShelf(shelfIndex) {
@@ -984,11 +875,7 @@
           if (title) {
             modifyState(s => {
               s.bookshelves[state.active].shelves[shelfIndex].books.push({
-                id: newId(),
-                title,
-                content: '',
-                tags: [],
-                gradient: crossBasketGradient()
+                id: newId(), title, content: '', tags: [], gradient: crossBasketGradient()
               });
             });
           }
@@ -998,9 +885,7 @@
       function saveToFile() {
         const dataStr = JSON.stringify(state, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-        
         const exportFileDefaultName = 'aethernote-backup.json';
-        
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
         linkElement.setAttribute('download', exportFileDefaultName);
@@ -1009,32 +894,14 @@
       
       function loadFromFile() {
         const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        
+        input.type = 'file'; input.accept = '.json';
         input.onchange = e => {
           const file = e.target.files[0];
           const reader = new FileReader();
-          
           reader.onload = event => {
             try {
               const newState = JSON.parse(event.target.result);
-              
-              // Validate structure
-              if (!newState.bookshelves || !Array.isArray(newState.bookshelves)) {
-                throw new Error('Invalid data structure: missing bookshelves array');
-              }
-              
-              // Validate individual bookshelf structure
-              newState.bookshelves.forEach(bs => {
-                if (!bs.name || !bs.id) {
-                  throw new Error('Invalid bookshelf structure');
-                }
-                if (bs.shelves && !Array.isArray(bs.shelves)) {
-                  throw new Error('Invalid shelves structure');
-                }
-              });
-              
+              if (!newState.bookshelves || !Array.isArray(newState.bookshelves)) throw new Error('Invalid data structure');
               normalizeState(newState);
               modifyState(s => {
                 s.bookshelves = newState.bookshelves;
@@ -1046,50 +913,51 @@
               console.error('Load error:', err);
             }
           };
-          
           reader.readAsText(file);
         };
-        
         input.click();
       }
       
-      async function updateApp() {
+     async function updateApp() {
+        if (!('serviceWorker' in navigator)) {
+          alert('This browser does not support updates.');
+          return;
+        }
+
         try {
-          // Clear all caches
-          const cacheKeys = await caches.keys();
-          await Promise.all(cacheKeys.map(key => caches.delete(key)));
-          
-          // Update service worker
-          if ('serviceWorker' in navigator) {
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (let registration of registrations) {
-              await registration.unregister();
-            }
-            
-            // Re-register service worker
-            await navigator.serviceWorker.register('./sw.js');
+          // 1. Ask the browser to check for a new service worker file on the server.
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (!registration) {
+            alert('No service worker found. Cannot update.');
+            return;
           }
-          
-          // Clear all stored data except user themes
-          const savedThemes = localStorage.getItem(THEMES_KEY);
-          localStorage.clear();
-          if (savedThemes) {
-            localStorage.setItem(THEMES_KEY, savedThemes);
+
+          // This will trigger the browser to fetch sw.js in the background.
+          await registration.update();
+
+          if (registration.waiting) {
+            // If a new worker is already waiting, we can activate it.
+            alert('A new version is ready. The app will now reload.');
+            // Send a message to the waiting service worker to take over.
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            // The service worker will take over, and we can reload.
+            window.location.reload();
+          } else if (registration.installing) {
+            // A new worker is installing. We can listen for it to finish.
+            console.log('New version found, installing...');
+            alert('Update found! The app will reload automatically when it is ready.');
+          } else {
+            alert('You already have the latest version of the app.');
           }
-          
-          // Reload the page
-          window.location.reload();
         } catch (error) {
           console.error('Update failed:', error);
-          window.location.reload(); // Fallback to simple reload
+          alert('Failed to check for updates. Please check your network connection.');
         }
       }
 
       async function initApp() {
         loadFromStorage(); 
         loadUserThemes();
-        
-        // Load system themes from the single themes.json file
         systemThemes = await loadSystemThemes();
         
         applyTheme(getThemeByName(state.activeTheme));
@@ -1102,28 +970,30 @@
         document.getElementById('updateBtn').innerHTML = `<span class="icon">${icons.update}</span> Update`;
         document.getElementById('menuBtn').onclick = function(e) { e.stopPropagation(); document.getElementById('menuDropdown').classList.toggle('show'); };
         window.onclick = () => document.getElementById('menuDropdown').classList.remove('show');
-        globalSearch.addEventListener('input', () => render());
+        
+        // Search bar logic
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        globalSearch.addEventListener('input', () => {
+          render();
+          clearSearchBtn.style.display = globalSearch.value.length > 0 ? 'block' : 'none';
+        });
+        clearSearchBtn.addEventListener('click', () => {
+          globalSearch.value = '';
+          clearSearchBtn.style.display = 'none';
+          render();
+          globalSearch.focus();
+        });
+
         document.getElementById('saveBtn').onclick = saveToFile;
         document.getElementById('loadBtn').onclick = loadFromFile;
         document.getElementById('updateBtn').onclick = updateApp;
         document.getElementById('themesBtn').onclick = showThemesModal;
         document.getElementById('tagsBtn').onclick = showTagsModal;
         
-        // Escape key handler
         document.addEventListener('keydown', function(event) {
           if (event.key === 'Escape') {
-            if (isModalOpen) {
-              // Try to find a close/cancel button in the modal
-              const modal = document.querySelector('.overlay.show');
-              if (modal) {
-                const closeButton = modal.querySelector('#cancelBtn, .btn.ghost, [title="Close"]');
-                if (closeButton) {
-                  closeButton.click();
-                } else {
-                  // If no specific close button, just hide the overlay
-                  hideOverlay();
-                }
-              }
+            if (isModalOpen && typeof activeModalCloseHandler === 'function') {
+              activeModalCloseHandler();
             }
           }
         });
