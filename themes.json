@@ -4,25 +4,27 @@
       "name": "Super Candy",
       "isSystem": true,
       "styles": {
-    "colors": {
-      "--bg-1": "#0c0e14",
-      "--bg-2": "#181b28",
-      "--accent": "#c50ed2",
-      "--ink": "#ffffff",
-      "--ink-dim": "#a3a3a3",
-      "--panel-10": "rgba(255,255,255,0.08)",
-      "--panel-16": "rgba(255,255,255,0.08)",
-      "--panel-24": "rgba(255,255,255,0.08)"
-    },
-    "dimensions": {
-      "--r-sm": "7px",
-      "--r-md": "10px",
-      "--border-thickness": "0px"
-    },
-    "shadows": {
-      "--shadow-1": "0 4px 12px rgba(0,0,0,0.2)",
-      "--shadow-inset": "none"
-    },
+        "colors": {
+          "--bg-1": "#0c0e14",
+          "--bg-2": "#181b28",
+          "--accent": "#c50ed2",
+          "--ink": "#ffffff",
+          "--ink-dim": "#a3a3a3",
+          "--panel-10": "rgba(24, 27, 40, 0.6)",
+          "--panel-16": "rgba(12, 14, 20, 0.6)",
+          "--panel-24": "rgba(24, 27, 40, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.1)"
+        },
+        "dimensions": {
+          "--r-sm": "7px",
+          "--r-md": "10px",
+          "--border-thickness": "0px"
+        },
+        "shadows": {
+          "--shadow-1": "0 4px 12px rgba(12, 14, 20, 0.3)",
+          "--shadow-inset": "none"
+        }
+      ,
     "icons": {
       "menu": "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='1'/><circle cx='19' cy='12' r='1'/><circle cx='5' cy='12' r='1'/></svg>",
       "save": "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' version='1.1'><path style='fill:currentColor' d='m 14,15 c 0.55,0 1,-0.45 1,-1 V 2.9999998 L 13,0.99999975 H 1.9999999 c -0.55,0 -1,0.45000005 -1,1.00000005 V 14 c 0,0.55 0.45,1 1,1 z M 13,13 H 2.9999999 V 2.9999998 h 1.0000002 v 5 H 12 v -5 h 1 z M 8.0000001,6.9999998 h -2 v -4 h 2 z'/></svg>",
@@ -36,9 +38,9 @@
       "chevronRight": "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path style='fill:currentColor' d='M 8 5 L 3 10 L 13 10 L 8 5 z'/></svg>",
       "rename": "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' version='1.1'><path style='fill:currentColor' d='M 12.778,1.2222 C 12.778,1.2222 12.278,0.72224 11.778,1.2222 L 10,3 13,6 14.778,4.2222 C 15.278,3.7222 14.778,3.2222 14.778,3.2222 Z M 9,4 1,12 V 15 H 4 L 12,7 Z'/></svg>",
       "check": "<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' version='1.1'><path style='fill:currentColor' d='M 13.5,5 C 13.5,5 14.465,4.035 13.715,3.285 12.965,2.535 12,3.5 12,3.5 L 6,10.5 4,8.5 C 4,8.5 3.035,7.535 2.285,8.285 1.535,9.035 2.5,10 2.5,10 L 6,13.5 Z'/></svg>"
-        }
-      }
-    },
+    }
+  }
+},
     {
       "name": "Crimson Night",
       "isSystem": true,
@@ -49,9 +51,10 @@
           "--accent": "#e50914",
           "--ink": "#f5f5f1",
           "--ink-dim": "#999",
-          "--panel-10": "rgba(255,255,255,0.05)",
-          "--panel-16": "rgba(255,255,255,0.08)",
-          "--panel-24": "rgba(255,255,255,0.12)"
+          "--panel-10": "rgba(42, 42, 46, 0.6)",
+          "--panel-16": "rgba(26, 26, 29, 0.6)",
+          "--panel-24": "rgba(42, 42, 46, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.14)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -59,8 +62,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(26, 26, 29, 0.4)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
         }
       }
     },
@@ -74,9 +77,10 @@
           "--accent": "#a2c523",
           "--ink": "#e0e0e0",
           "--ink-dim": "#a0a0a0",
-          "--panel-10": "rgba(0,0,0,0.1)",
-          "--panel-16": "rgba(0,0,0,0.15)",
-          "--panel-24": "rgba(0,0,0,0.2)"
+          "--panel-10": "rgba(42, 82, 79, 0.6)",
+          "--panel-16": "rgba(30, 60, 66, 0.6)",
+          "--panel-24": "rgba(42, 82, 79, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.1)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -84,8 +88,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(30, 60, 66, 0.4)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
         }
       }
     },
@@ -99,18 +103,19 @@
           "--accent": "#ffd700",
           "--ink": "#f0e6d2",
           "--ink-dim": "#bdae93",
-          "--panel-10": "rgba(255,255,255,0.08)",
-          "--panel-16": "rgba(255,255,255,0.12)",
-          "--panel-24": "rgba(255,255,255,0.18)"
+          "--panel-10": "rgba(79, 76, 122, 0.6)",
+          "--panel-16": "rgba(44, 42, 77, 0.6)",
+          "--panel-24": "rgba(79, 76, 122, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.14)"
         },
         "dimensions": {
           "--r-sm": "10px",
-          "--极-md": "12px",
+          "--極-md": "12px",
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(44, 42, 77, 0.4)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
         }
       }
     },
@@ -124,9 +129,10 @@
           "--accent": "#333",
           "--ink": "#111",
           "--ink-dim": "#666",
-          "--panel-10": "rgba(0,0,0,0.05)",
-          "--panel-16": "rgba(0,0,0,0.08)",
-          "--panel-24": "rgba(0,0,0,0.1)"
+          "--panel-10": "rgba(224, 224, 224, 0.5)",
+          "--panel-16": "rgba(245, 245, 245, 0.5)",
+          "--panel-24": "rgba(224, 224, 224, 0.6)",
+          "--panel-border": "rgba(0, 0, 0, 0.1)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -134,8 +140,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 4px 15px rgba(224, 224, 224, 0.5)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(0, 0, 0, 0.1)"
         }
       }
     },
@@ -149,9 +155,10 @@
           "--accent": "#1abc9c",
           "--ink": "#ecf0f1",
           "--ink-dim": "#bdc3c7",
-          "--panel-10": "rgba(255,255,255,0.04)",
-          "--panel-16": "rgba(255,255,255,0.06)",
-          "--panel-24": "rgba(255,255,255,0.08)"
+          "--panel-10": "rgba(52, 73, 94, 0.6)",
+          "--panel-16": "rgba(44, 62, 80, 0.6)",
+          "--panel-24": "rgba(52, 73, 94, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.12)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -159,8 +166,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(44, 62, 80, 0.4)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
         }
       }
     },
@@ -174,9 +181,10 @@
           "--accent": "#bb86fc",
           "--ink": "#ffffff",
           "--ink-dim": "#a3a3a3",
-          "--panel-10": "rgba(255,255,255,0.04)",
-          "--panel-16": "rgba(255,255,255,0.06)",
-          "--panel-24": "rgba(255,255,255,0.08)"
+          "--panel-10": "rgba(30, 30, 30, 0.6)",
+          "--panel-16": "rgba(18, 18, 18, 0.6)",
+          "--panel-24": "rgba(30, 30, 30, 0.7)",
+          "--panel-border": "rgba(255, 255, 255, 0.14)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -184,8 +192,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(18, 18, 18, 0.4)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
         }
       }
     },
@@ -199,9 +207,10 @@
           "--accent": "#039be5",
           "--ink": "#1a237e",
           "--ink-dim": "#424242",
-          "--panel-10": "rgba(0,0,0,0.04)",
-          "--panel-16": "rgba(0,0,0,0.06)",
-          "--panel-24": "rgba(0,0,0,0.08)"
+          "--panel-10": "rgba(179, 229, 252, 0.5)",
+          "--panel-16": "rgba(225, 245, 254, 0.5)",
+          "--panel-24": "rgba(179, 229, 252, 0.6)",
+          "--panel-border": "rgba(0, 0, 0, 0.08)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -209,8 +218,8 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,0.1)"
+          "--shadow-1": "0 8px 30px rgba(179, 229, 252, 0.5)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(0, 0, 0, 0.1)"
         }
       }
     },
@@ -224,9 +233,10 @@
           "--accent": "#ff6347",
           "--ink": "#4a4a4a",
           "--ink-dim": "#808080",
-          "--panel-10": "rgba(0,0,0,0.04)",
-          "--panel-16": "rgba(0,0,0,0.06)",
-          "--panel-24": "rgba(0,0,0,0.08)"
+          "--panel-10": "rgba(240, 230, 140, 0.5)",
+          "--panel-16": "rgba(245, 245, 220, 0.5)",
+          "--panel-24": "rgba(240, 230, 140, 0.6)",
+          "--panel-border": "rgba(0, 0, 0, 0.09)"
         },
         "dimensions": {
           "--r-sm": "10px",
@@ -234,8 +244,34 @@
           "--border-thickness": "1px"
         },
         "shadows": {
-          "--shadow-1": "0 8px 30px rgba(0,0,0,0.4)",
-          "--shadow-inset": "inset 0 0 0 1px rgba(255,255,255,极.1)"
+          "--shadow-1": "0 8px 30px rgba(240, 230, 140, 0.5)",
+          "--shadow-inset": "inset 0 0 0 1px rgba(0, 0, 0, 0.1)"
+        }
+      }
+    },
+    {
+      "name": "Soft Material",
+      "isSystem": true,
+      "styles": {
+        "colors": {
+          "--bg-1": "#F4F6F8",
+          "--bg-2": "#FFFFFF",
+          "--accent": "#3498DB",
+          "--ink": "#2C3E50",
+          "--ink-dim": "#7F8C8D",
+          "--panel-10": "rgba(255, 255, 255, 0.5)",
+          "--panel-16": "rgba(244, 246, 248, 0.5)",
+          "--panel-24": "rgba(255, 255, 255, 0.6)",
+          "--panel-border": "rgba(0, 0, 0, 0.1)"
+        },
+        "dimensions": {
+          "--r-sm": "8px",
+          "--r-md": "16px",
+          "--border-thickness": "1px"
+        },
+        "shadows": {
+          "--shadow-1": "0 4px 12px rgba(220, 220, 220, 0.5)",
+          "--shadow-inset": "inset 0 1px 2px rgba(0, 0, 0, 0.05)"
         }
       }
     }
