@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aethernote-cache-v5.2';
+const CACHE_NAME = 'aethernote-cache-v5.3';
 const URLS_TO_CACHE = [
   './',
   './index.html',

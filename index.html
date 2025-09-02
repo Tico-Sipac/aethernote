@@ -540,16 +540,58 @@
       }
 
       const SYSTEM_THEMES = [
-        { name: 'Cyber Glow', isSystem: true, styles: {
-            colors: { '--bg-1': '#0d0221', '--bg-2': '#24174d', '--accent': '#00d5ff', '--ink': '#f0f0f0', '--ink-dim':'#a0a0a0', '--panel-10': 'rgba(255,255,255,0.08)', '--panel-16': 'rgba(255,255,255,0.12)', '--panel-24': 'rgba(255,255,255,0.20)' },
-            dimensions: { '--r-sm': '10px', '--r-md': '12px', '--border-thickness': '1px' },
-            shadows: { '--shadow-1': '0 8px 30px rgba(0,0,0,0.4)', '--shadow-inset': 'inset 0 0 0 1px rgba(255,255,255,0.1)' }
-        }},
-        { name: 'Soft Material', isSystem: true, styles: {
-            colors: { '--bg-1': '#F4F6F8', '--bg-2': '#FFFFFF', '--accent': '#3498DB', '--ink': '#2C3E50', '--ink-dim': '#7F8C8D', '--panel-10': 'rgba(44, 62, 80, 0.05)', '--panel-16': 'rgba(44, 62, 80, 0.1)', '--panel-24': 'rgba(44, 62, 80, 0.15)'},
-            dimensions: { '--r-sm': '8px', '--r-md': '16px', '--border-thickness': '1px' },
-            shadows: { '--shadow-1': '0 4px 12px rgba(0,0,0,0.1)', '--shadow-inset': 'inset 0 1px 2px rgba(0,0,0,0.05)' }
-        }},
+        { 
+          name: 'Cyber Glow', 
+          isSystem: true, 
+          styles: {
+            colors: { 
+              '--bg-1': '#0d0221', 
+              '--bg-2': '#24174d', 
+              '--accent': '#00d5ff', 
+              '--ink': '#f0f0f0', 
+              '--ink-dim':'#a0a0a0', 
+              '--panel-10': 'rgba(36, 23, 77, 0.6)',   /* from --bg-2 */
+              '--panel-16': 'rgba(13, 2, 33, 0.6)',    /* from --bg-1 */
+              '--panel-24': 'rgba(36, 23, 77, 0.7)',   /* from --bg-2 */
+              '--panel-border': 'rgba(255, 255, 255, 0.1)'
+            },
+            dimensions: { 
+              '--r-sm': '10px', 
+              '--r-md': '12px', 
+              '--border-thickness': '1px' 
+            },
+            shadows: { 
+              '--shadow-1': '0 8px 30px rgba(13, 2, 33, 0.4)', /* from --bg-1 */
+              '--shadow-inset': 'inset 0 0 0 1px rgba(255, 255, 255, 0.1)' 
+            }
+          }
+        },
+        { 
+          name: 'Soft Material', 
+          isSystem: true, 
+          styles: {
+            colors: { 
+              '--bg-1': '#F4F6F8', 
+              '--bg-2': '#FFFFFF', 
+              '--accent': '#3498DB', 
+              '--ink': '#2C3E50', 
+              '--ink-dim': '#7F8C8D', 
+              '--panel-10': 'rgba(255, 255, 255, 0.5)', /* from --bg-2 */
+              '--panel-16': 'rgba(244, 246, 248, 0.5)', /* from --bg-1 */
+              '--panel-24': 'rgba(255, 255, 255, 0.6)', /* from --bg-2 */
+              '--panel-border': 'rgba(0, 0, 0, 0.1)'
+            },
+            dimensions: { 
+              '--r-sm': '8px', 
+              '--r-md': '16px', 
+              '--border-thickness': '1px' 
+            },
+            shadows: { 
+              '--shadow-1': '0 4px 12px rgba(220, 220, 220, 0.5)', /* derived from backgrounds */
+              '--shadow-inset': 'inset 0 1px 2px rgba(0, 0, 0, 0.05)' 
+            }
+          }
+        },
       ];
       const ICONS = {
         default: {
