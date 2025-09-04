@@ -86,9 +86,6 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
     const modal = createEl('div', { className: 'modal' });
     modal.innerHTML = `<h3>${safe(book.title)}</h3>`;
     
-    // --- Start of Changed Section ---
-
-    // 1. Create the individual editor components
     const textarea = createEl('textarea', { id: 'noteArea', placeholder: 'Write your note...' });
     textarea.value = book.content || '';
     
@@ -97,13 +94,9 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
     const tagsDisplay = createEl('div', { className: 'tags-display' });
     tagsInputWrapper.append(tagsInput);
 
-    // 2. Create the new unified wrapper
     const editorWrapper = createEl('div', { className: 'editor-wrapper' });
-
-    // 3. Append the components to the new wrapper in the correct visual order
-    editorWrapper.append(textarea, tagsDisplay, tagsInputWrapper);
     
-    // --- End of Changed Section ---
+    editorWrapper.append(textarea, tagsDisplay, tagsInputWrapper);
 
     const renderTags = () => {
       tagsDisplay.innerHTML = '';
@@ -136,7 +129,6 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
     leftActions.append(renameBtn, deleteBtn);
     rightActions.append(closeBtn, saveBtn);
 
-    // Append the single editor wrapper to the modal now
     modal.append(editorWrapper, actions);
 
     const doSaveAndClose = () => {
@@ -149,10 +141,19 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
     showOverlay(modal, doSaveAndClose);
     textarea.focus();
 
+    // --- THIS IS THE CORRECTED SECTION ---
     renameBtn.onclick = async () => {
       const newTitle = await promptText('Rename Book', 'New book title', book.title);
-      if (newTitle) { book.title = newTitle; modal.querySelector('h3').textContent = newTitle; }
+      if (newTitle) {
+        book.title = newTitle; // Update the object in memory
+        modal.querySelector('h3').textContent = newTitle; // Update the modal UI
+        
+        // THIS IS THE FIX: Force a save and re-render of the main app
+        modifyState(() => {}); 
+      }
     };
+    // --- END OF CORRECTED SECTION ---
+    
     deleteBtn.onclick = async () => {
       if (await confirmAction(`Delete "${book.title}"?`)) {
         hideOverlay();
