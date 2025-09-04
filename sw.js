@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aethernote-cache-v8.1-modular'; // IMPORTANT: Version is incremented
+const CACHE_NAME = 'aethernote-cache-v8.2-modular'; // IMPORTANT: Version is incremented
 const URLS_TO_CACHE = [
   './',
   './index.html',
