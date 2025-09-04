@@ -103,7 +103,16 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
       (book.tags || []).forEach((tag, tagIndex) => {
         const tagItem = createEl('div', { className: 'tag-item', textContent: tag });
         const deleteTagBtn = createEl('span', { className: 'delete-tag', innerHTML: '&times;', title: 'Remove tag' });
-        deleteTagBtn.onclick = () => { book.tags.splice(tagIndex, 1); renderTags(); };
+        
+        // --- TAG DELETION FIX ---
+        deleteTagBtn.onclick = () => { 
+          book.tags.splice(tagIndex, 1);
+          // Silently save the state without re-rendering the main app
+          modifyState(() => {}, false); 
+          renderTags(); 
+        };
+        // --- END OF FIX ---
+
         tagItem.append(deleteTagBtn);
         tagsDisplay.append(tagItem);
       });
@@ -112,7 +121,16 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
 
     const addPendingTag = () => {
       const newTag = tagsInput.value.trim().toLowerCase();
-      if (newTag && !(book.tags || []).includes(newTag)) { book.tags.push(newTag); renderTags(); }
+      if (newTag && !(book.tags || []).includes(newTag)) {
+        book.tags.push(newTag);
+        
+        // --- TAG ADDITION FIX ---
+        // Silently save the state without re-rendering the main app
+        modifyState(() => {}, false);
+        // --- END OF FIX ---
+
+        renderTags();
+      }
       tagsInput.value = '';
     };
     tagsInput.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addPendingTag(); } };
@@ -133,26 +151,26 @@ export function editBook(book, bsIndex, shelfIndex, bookIndex) {
 
     const doSaveAndClose = () => {
       book.content = textarea.value;
-      addPendingTag();
+      // The tag is already added/saved, so we just clear the input here
+      const newTag = tagsInput.value.trim().toLowerCase();
+      if(newTag) addPendingTag();
+      
+      // Save the final content and re-render the main app
       modifyState(s => { s.bookshelves[bsIndex].shelves[shelfIndex].books[bookIndex] = book; });
       hideOverlay();
     };
 
     showOverlay(modal, doSaveAndClose);
     textarea.focus();
-
-    // --- THIS IS THE CORRECTED SECTION ---
+    
     renameBtn.onclick = async () => {
       const newTitle = await promptText('Rename Book', 'New book title', book.title);
       if (newTitle) {
-        book.title = newTitle; // Update the object in memory
-        modal.querySelector('h3').textContent = newTitle; // Update the modal UI
-        
-        // THIS IS THE FIX: Force a save and re-render of the main app
+        book.title = newTitle;
+        modal.querySelector('h3').textContent = newTitle;
         modifyState(() => {}); 
       }
     };
-    // --- END OF CORRECTED SECTION ---
     
     deleteBtn.onclick = async () => {
       if (await confirmAction(`Delete "${book.title}"?`)) {
