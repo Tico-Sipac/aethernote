@@ -1,27 +1,34 @@
-const CACHE_NAME = 'aethernote-cache-v5.3';
+const CACHE_NAME = 'aethernote-cache-v8-modular'; // IMPORTANT: Version is incremented
 const URLS_TO_CACHE = [
   './',
   './index.html',
-  './themes.json', // Single theme file
+  './themes.json',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './css/styles.css',
+  './js/app.js',
+  './js/ui.js',
+  './js/theme-engine.js',
+  './js/state.js',
+  './js/icons.js',
+  './js/utils.js',
   'https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap'
 ];
 
-// Install: Caches core assets
+// Install: Caches core assets and tells the worker to activate immediately.
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching app shell');
+        console.log('Service Worker: Caching new app shell');
         return cache.addAll(URLS_TO_CACHE);
       })
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate: Cleans up old caches
+// Activate: Cleans up old caches from previous versions.
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -35,62 +42,31 @@ self.addEventListener('activate', event => {
         })
       );
     })
+    .then(() => self.clients.claim())
   );
-  return self.clients.claim();
 });
 
-// Fetch: Serves assets from cache, falling back to network
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
+// Fetch: Serves assets from cache, falling back to network (cache-first for reliability)
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-  
-  // Handle theme file with network-first strategy
-  if (event.request.url.includes('themes.json')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Cache the theme file for offline use
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put(event.request, responseClone));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-  
-  // Handle Google Fonts
-  if (event.request.url.includes('fonts.googleapis.com') || 
-      event.request.url.includes('fonts.gstatic.com')) {
-    event.respondWith(
-      caches.match(event.request)
-        .then(response => {
-          if (response) return response;
-          
-          return fetch(event.request).then(networkResponse => {
-            // Cache the font response
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME)
-              .then(cache => cache.put(event.request, responseClone));
-            return networkResponse;
-          });
-        })
-        .catch(() => {
-          // Fallback to default font if both cache and network fail
-          return new Response('body { font-family: system-ui, sans-serif; }', {
-            headers: { 'Content-Type': 'text/css' }
-          });
-        })
-    );
-    return;
-  }
-  
-  // For all other requests, use cache-first strategy
+
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        if (response) return response;
-        return fetch(event.request);
+        if (response) {
+          return response;
+        }
+        return fetch(event.request).then(
+          networkResponse => {
+            return networkResponse;
+          }
+        );
       })
   );
 });
